@@ -27,9 +27,16 @@
 
       .tab-group {
         display: flex;
+        justify-content: space-between;
         position: absolute;
         top: -26px;
         left: 0;
+        width: 100%;
+      }
+
+      .tab-left, .tab-right {
+        display: flex;
+        gap: 0px;
       }
 
       .tab-link {
@@ -72,13 +79,19 @@
   <body>
     <div class="box">
       <div class="tab-group">
-        <a class="tab-link" href="/shredsauce/">/shredsauce</a>
-        <a class="tab-link" href="/shredsauce/scripts">scripts</a>
-        <div class="tab-link active">cheats</div>
-        <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+        <div class="tab-left">
+          <a class="tab-link" href="/shredsauce/">/shredsauce</a>
+          <a class="tab-link" href="/shredsauce/scripts">scripts</a>
+          <div class="tab-link active">cheats</div>
+          <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+        </div>
+        <div class="tab-right">
+          <a class="tab-link" href="https://gheat.net/">home</a>
+        </div>
       </div>
+
       <p>cheats tab active</p>
-      <p>cheat list goes here</p>
+      <p>good place to drop proxy loaders, unlockers, or injected scripts</p>
       <p><span class="cursor"></span></p>
     </div>
   </body>
