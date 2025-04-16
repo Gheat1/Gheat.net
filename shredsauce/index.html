@@ -27,9 +27,16 @@
 
       .tab-group {
         display: flex;
+        justify-content: space-between;
         position: absolute;
         top: -26px;
         left: 0;
+        width: 100%;
+      }
+
+      .tab-left, .tab-right {
+        display: flex;
+        gap: 2px;
       }
 
       .tab-link {
@@ -72,11 +79,17 @@
   <body>
     <div class="box">
       <div class="tab-group">
-        <div class="tab-link active">/shredsauce</div>
-        <a class="tab-link" href="/shredsauce/scripts">scripts</a>
-        <a class="tab-link" href="/shredsauce/cheats">cheats</a>
-        <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+        <div class="tab-left">
+          <div class="tab-link active">/shredsauce</div>
+          <a class="tab-link" href="/shredsauce/scripts">scripts</a>
+          <a class="tab-link" href="/shredsauce/cheats">cheats</a>
+          <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+        </div>
+        <div class="tab-right">
+        <a class="tab-link" href="https://gheat.net/">home</a>
       </div>
+      </div>
+
       <p>welcome to the shredsauce section</p>
       <p>pick a tab above to explore stuff</p>
       <p><span class="cursor"></span></p>
