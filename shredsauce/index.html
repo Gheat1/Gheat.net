@@ -25,18 +25,33 @@
         box-sizing: border-box;
       }
 
-      .tab {
+      .tab-group {
+        display: flex;
         position: absolute;
-        top: -25px;
+        top: -26px;
         left: 0;
+      }
+
+      .tab-link {
         background: #111;
         color: white;
-        padding: 5px 15px;
+        padding: 5px 12px;
         font-size: 14px;
         border: 1px solid #fff;
         border-bottom: none;
+        text-decoration: none;
+        font-family: monospace;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
+        transition: background 0.2s;
+      }
+
+      .tab-link:hover {
+        background: #222;
+      }
+
+      .tab-link.active {
+        background: #444;
       }
 
       .cursor {
@@ -56,9 +71,14 @@
   </head>
   <body>
     <div class="box">
-      <div class="tab">/shredsauce</div>
-      <p>cheats, scripts, tools, tutorials, and random sauce.</p>
-      <p>more stuff coming soon...</p>
+      <div class="tab-group">
+        <div class="tab-link active">/shredsauce</div>
+        <a class="tab-link" href="/shredsauce/scripts">scripts</a>
+        <a class="tab-link" href="/shredsauce/cheats">cheats</a>
+        <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+      </div>
+      <p>welcome to the shredsauce section</p>
+      <p>pick a tab above to explore stuff</p>
       <p><span class="cursor"></span></p>
     </div>
   </body>
