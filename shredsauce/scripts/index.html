@@ -2,7 +2,7 @@
 <html>
   <head>
     <link rel="icon" href="../favicon.png" type="image/png">
-    <title>scripts - gheat.net/shredsauce</title>
+    <title>tutorials - gheat.net/shredsauce</title>
     <style>
       body {
         background-color: #000;
@@ -11,34 +11,30 @@
         color: white;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         height: 100vh;
+        padding: 0;
       }
 
-      .box {
+      .container {
         position: relative;
-        background: #000;
-        padding: 30px;
-        border: 1px solid #fff;
         width: 80%;
-        max-width: 700px;
-        min-height: 300px;
-        box-sizing: border-box;
-        text-align: left;
+        max-width: 800px;
+        margin-top: 60px;
       }
 
-      .tab-group {
-        display: flex;
-        justify-content: space-between;
+      .tab-bar {
         position: absolute;
         top: -26px;
         left: 0;
         width: 100%;
+        display: flex;
+        justify-content: space-between;
       }
 
-      .tab-left, .tab-right {
+      .tab-left {
         display: flex;
-        gap: 0px;
+        gap: 0;
       }
 
       .tab-link {
@@ -52,15 +48,51 @@
         font-family: monospace;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
-        transition: background 0.2s;
+      }
+
+      .tab-link.active {
+        background: #444;
       }
 
       .tab-link:hover {
         background: #222;
       }
 
-      .tab-link.active {
-        background: #444;
+      .box {
+        background: #000;
+        padding: 20px;
+        border: 1px solid #fff;
+        height: 90vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+
+      .tutorial {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 40px;
+        align-items: flex-start;
+      }
+
+      .tutorial iframe {
+        width: 300px;
+        height: 168px;
+        border: 1px solid #555;
+      }
+
+      .tutorial-text {
+        flex: 1;
+      }
+
+      .tutorial-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 6px;
+      }
+
+      .tutorial-desc {
+        font-size: 14px;
+        line-height: 1.4;
       }
 
       .cursor {
@@ -76,51 +108,38 @@
           opacity: 0;
         }
       }
-
-      .button-wrapper {
-        text-align: center;
-        margin-top: 30px;
-      }
-
-      .script-button {
-        display: inline-block;
-        padding: 10px 16px;
-        background: #111;
-        color: white;
-        border: 1px solid white;
-        text-decoration: none;
-        font-family: monospace;
-        border-radius: 4px;
-        transition: background 0.2s;
-      }
-
-      .script-button:hover {
-        background: #222;
-      }
     </style>
   </head>
   <body>
-    <div class="box">
-      <div class="tab-group">
+    <div class="container">
+      <div class="tab-bar">
         <div class="tab-left">
           <a class="tab-link" href="/shredsauce/">/shredsauce</a>
-          <div class="tab-link active">scripts</div>
+          <a class="tab-link" href="/shredsauce/scripts">scripts</a>
           <a class="tab-link" href="/shredsauce/cheats">cheats</a>
-          <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+          <div class="tab-link active">tutorials</div>
         </div>
-        <div class="tab-right">
-          <a class="tab-link" href="https://gheat.net/">home</a>
-        </div>
+        <a class="tab-link" href="https://gheat.net/">home</a>
       </div>
 
-      <p>scripts / themes</p>
-      <p>instal tutorials in tutorials tab, must have Ublock.</p>
-      <p><span class="cursor"></span></p>
+      <div class="box">
+        <div class="tutorial">
+          <iframe src="https://www.youtube.com/embed/bl4ZbQ955EI" frameborder="0" allowfullscreen></iframe>
+          <div class="tutorial-text">
+            <div class="tutorial-title">How to install the Dark Theme</div>
+            <div class="tutorial-desc">Step-by-step instructions for installing the Shredsauce dark theme Tampermonkey script.</div>
+          </div>
+        </div>
 
-      <div class="button-wrapper">
-        <a href="/shredsauce/scripts/Shredsauce%20dark%20Theme-1.9.0.user.js" class="script-button">
-          install dark theme script
-        </a>
+        <div class="tutorial">
+          <iframe src="https://www.youtube.com/embed/yd1OCJK_mVA" frameborder="0" allowfullscreen></iframe>
+          <div class="tutorial-text">
+            <div class="tutorial-title">Custom textures</div>
+            <div class="tutorial-desc">Step-by-Step instructions for installing custom textures into shredsauce using content overides.</div>
+          </div>
+        </div>
+
+        <span class="cursor"></span>
       </div>
     </div>
   </body>
