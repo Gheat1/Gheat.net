@@ -10,33 +10,30 @@
         color: white;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         height: 100vh;
+        padding: 0;
       }
 
-      .box {
+      .container {
         position: relative;
-        background: #000;
-        padding: 30px;
-        border: 1px solid #fff;
         width: 80%;
-        max-width: 700px;
-        min-height: 300px;
-        box-sizing: border-box;
+        max-width: 800px;
+        margin-top: 60px;
       }
 
-      .tab-group {
-        display: flex;
-        justify-content: space-between;
+      .tab-bar {
         position: absolute;
         top: -26px;
         left: 0;
         width: 100%;
+        display: flex;
+        justify-content: space-between;
       }
 
-      .tab-left, .tab-right {
+      .tab-left {
         display: flex;
-        gap: 0px;
+        gap: 0;
       }
 
       .tab-link {
@@ -50,15 +47,30 @@
         font-family: monospace;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;
-        transition: background 0.2s;
+      }
+
+      .tab-link.active {
+        background: #444;
       }
 
       .tab-link:hover {
         background: #222;
       }
 
-      .tab-link.active {
-        background: #444;
+      .box {
+        background: #000;
+        padding: 20px;
+        border: 1px solid #fff;
+        height: 90vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 0;
+        font-family: monospace;
       }
 
       .cursor {
@@ -77,22 +89,98 @@
     </style>
   </head>
   <body>
-    <div class="box">
-      <div class="tab-group">
+    <div class="container">
+      <div class="tab-bar">
         <div class="tab-left">
           <a class="tab-link" href="/shredsauce/">/shredsauce</a>
           <a class="tab-link" href="/shredsauce/scripts">scripts</a>
           <div class="tab-link active">cheats</div>
           <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
         </div>
-        <div class="tab-right">
-          <a class="tab-link" href="https://gheat.net/">home</a>
-        </div>
+        <a class="tab-link" href="https://gheat.net/">home</a>
       </div>
 
-      <p>cheats tab active</p>
-      <p>good place to drop proxy loaders, unlockers, or injected scripts</p>
-      <p><span class="cursor"></span></p>
+      <div class="box">
+        <pre>
+✦ Cheats
+(DNW) – does not work anymore
+
+✦ 1 Skier
+  1.1 Physics
+    cementfeet - locks you into place
+    dontcrash - you don’t crash
+    superspin - spin fast
+    lowgravity - low gravity
+    reedspeedman - Removes speed cap
+
+  1.2 Miscellaneous
+    Turpinturning - turns head when switching directions
+    Harrypottercloak - invisible character
+    Startboosted - hit tab & saves speed. after respawn u keep it
+
+✦ 2 Grabs
+  Animpacktest - test different grab packs
+  Showallposeslots - set more grabs
+  grabselectorparams - animated grabs
+  Tempforcesave - save the grab if broken
+
+✦ 3 Gear
+  Gearpacktest - test different gear packs (DNW)
+  remotefeatures - cool features for maps and gear
+  Tempforcesave - save the gear if broken
+  cleanthatshit - Fix Corrupted Gear
+
+✦ 4 Visuals
+  Starrynight - starry night
+  Badtripsky - green screen sky
+  nightmodetest - switch between night and day
+  oldschoolgraphics - old graphics
+
+✦ 5 Maps
+  5.1 Editor
+    remotefeatures - cool features for maps and gear
+    Customfeatures - make copy and paste features
+    Showownfeatures - pasting features
+    Tempforcesave - save the map if broken
+    Mapoffset - shift map around
+    Skypaintertest - Paint custom sky (DNW)
+
+  5.2 Game
+    Bluescreenfix - fixes old maps
+    Flippityflip - flips map
+    Powday - makes it pow
+
+✦ 6 Filming / Camera
+  6.1 Camera
+    slowbrocamera - first person
+    cooldronedawg - drone camera
+    Isometricmode - top down view
+
+  6.2 Filming
+    Eheathplz - camera in hand
+    camerasteeze - filming
+    nomoreui - gets rid of UI
+    Replaytest - replay
+    Sunsetshoot - sunset (DNW)
+
+✦ 7 Online Related
+  Savingprivateroom - passwords on rooms
+  Andyparry - lag everyone skis everywhere
+  Nonamebrandsauce - no name in multiplayer
+
+✦ 8 Miscellaneous
+  Targetfps(fps number) - smoother feel (60 = consistent / 240 = butter)
+  scootermcpooter - scooter
+  StopOz187 - unsure (DNW)
+  SNWSK8 - use in APT with snowboard
+  Debugotron - debugger for errors
+
+✦ Credits
+  QuintCork - Made the research a lot easier
+  Dog.. - TargetFps Suggestion
+<span class="cursor"></span>
+        </pre>
+      </div>
     </div>
   </body>
 </html>
