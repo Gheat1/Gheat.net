@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>shredsauce - gheat.net</title>
+    <style>
+      body {
+        background-color: #000;
+        margin: 0;
+        font-family: monospace;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .box {
+        position: relative;
+        background: #000;
+        padding: 30px;
+        border: 1px solid #fff;
+        width: 80%;
+        max-width: 700px;
+        min-height: 300px;
+        box-sizing: border-box;
+      }
+
+      .tab {
+        position: absolute;
+        top: -25px;
+        left: 0;
+        background: #111;
+        color: white;
+        padding: 5px 15px;
+        font-size: 14px;
+        border: 1px solid #fff;
+        border-bottom: none;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 10px;
+        height: 1em;
+        background: white;
+        animation: blink 1s step-start infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="tab">/shredsauce</div>
+      <p>cheats, scripts, tools, tutorials, and random sauce.</p>
+      <p>more stuff coming soon...</p>
+      <p><span class="cursor"></span></p>
+    </div>
+  </body>
+</html>
