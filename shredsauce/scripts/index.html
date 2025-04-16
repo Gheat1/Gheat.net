@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="icon" href="../favicon.png" type="image/png">
     <title>scripts - gheat.net/shredsauce</title>
     <style>
       body {
@@ -23,6 +24,7 @@
         max-width: 700px;
         min-height: 300px;
         box-sizing: border-box;
+        text-align: left;
       }
 
       .tab-group {
@@ -74,6 +76,27 @@
           opacity: 0;
         }
       }
+
+      .button-wrapper {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .script-button {
+        display: inline-block;
+        padding: 10px 16px;
+        background: #111;
+        color: white;
+        border: 1px solid white;
+        text-decoration: none;
+        font-family: monospace;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+
+      .script-button:hover {
+        background: #222;
+      }
     </style>
   </head>
   <body>
@@ -90,9 +113,15 @@
         </div>
       </div>
 
-      <p>scripts tab active</p>
-      <p>tampermonkey code, js tools</p>
+      <p>scripts / themes</p>
+      <p>instal tutorials in tutorials tab, must have Ublock.</p>
       <p><span class="cursor"></span></p>
+
+      <div class="button-wrapper">
+        <a href="/shredsauce/scripts/Shredsauce%20dark%20Theme-1.9.0.user.js" class="script-button">
+          install dark theme script
+        </a>
+      </div>
     </div>
   </body>
 </html>
