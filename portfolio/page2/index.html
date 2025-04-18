@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="icon" href="../favicon.png" type="image/png">
-    <title>gheat.net/portfolio/page2</title>
+    <title>Gheat.net/Portfolio/page2</title>
     <style>
       body {
         background-color: #000;
@@ -27,20 +26,27 @@
         overflow: visible;
         z-index: 1;
       }
-     .tab {
-      position: absolute;
-	  top: -25px;
-	  left: 0;
-	  background: #111;
-	  color: white;
-	  padding: 5px 15px;
-	  font-size: 14px;
-	  border: 1px solid #fff;
-	  border-bottom: none;
-	  border-top-left-radius: 6px;
-	  border-top-right-radius: 6px;
-	  z-index: 2; /* make sure it's above the box */
-	  }
+      .tab {
+        position: absolute;
+        top: -25px;
+        left: 0;
+        background: #111;
+        color: white;
+        padding: 5px 15px;
+        font-size: 14px;
+        border: 1px solid #fff;
+        border-bottom: none;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        z-index: 2;
+      }
+      #content a {
+        color: white;
+        text-decoration: none;
+      }
+      #content a:hover {
+        text-decoration: underline;
+      }
       #content p {
         margin: 0 0 10px;
         line-height: 1.4;
@@ -56,20 +62,24 @@
       @keyframes blink {
         50% { opacity: 0; }
       }
-      .next-btn {
+      .btn-group {
         position: absolute;
         bottom: 15px;
         right: 15px;
+        display: flex;
+        gap: 10px;
+      }
+      .nav-btn {
         padding: 8px 16px;
-        border: 1px solid #fff;
+        border: 1px solid white;
         background: #000;
-        color: #fff;
+        color: white;
         font-size: 14px;
         font-family: monospace;
         text-decoration: none;
         transition: background 0.2s, box-shadow 0.2s;
       }
-      .next-btn:hover {
+      .nav-btn:hover {
         background: #111;
         box-shadow: 0 0 8px white;
       }
@@ -77,52 +87,62 @@
   </head>
   <body>
     <div class="box">
-      <div class="tab">gheat.net/portfolio/page2</div>
+      <div class="tab">Gheat.net/Portfolio/page2</div>
       <div id="content"></div>
-      <a class="next-btn" href="/portfolio/page2">Next →</a>
+      <div class="btn-group">
+        <a class="nav-btn" href="/portfolio">&#8592; Back</a>
+        <a class="nav-btn" href="/portfolio/page3">Next &#8594;</a>
+      </div>
     </div>
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const lines = [
-          "Hello, I am Jaeden.",
-          "I have been coding since I was a kid.",
-          "This website is fully coded by myself in HTML5, but I am also good at JavaScript.",
-          "I'm a competitive skier at the moment and love the sport.",
-          "Most of my free time is spent making games and coding mods for games.",
-          "Here is some of the work I have done and reviews I have gotten..."
+        const links = [
+          { label: "Menu", href: "/portfolio/page2" },
+          { label: "Projects", href: "/portfolio/projects" },
+          { label: "Reviews", href: "/portfolio/reviews" },
+          { label: "Contact", href: "/portfolio/contact" },
+          { label: "Games I've Built", href: "/portfolio/projects/games" },
+          { label: "Mods I've Made", href: "/portfolio/projects/mods" },
+          { label: "What People Say", href: "/portfolio/reviews/testimonials" },
+          { label: "How to Reach Me", href: "/portfolio/contact/form" }
         ];
 
         const container = document.getElementById('content');
         let idx = 0;
 
-        async function typeLine(text) {
+        async function typeLine(item) {
           return new Promise(resolve => {
+            const a = document.createElement('a');
+            a.href = item.href;
             const p = document.createElement('p');
-            container.appendChild(p);
-            let i = 0;
+            a.appendChild(p);
+            container.appendChild(a);
 
+            let i = 0;
             const cursor = document.createElement('span');
             cursor.className = 'cursor';
 
             const ticker = setInterval(() => {
-              if (i < text.length) {
-                p.textContent += text.charAt(i++);
+              if (i < item.label.length + 2) {
+                const text = "▸ " + item.label.substring(0, i);
+                p.textContent = text;
+                i++;
               } else {
                 clearInterval(ticker);
                 p.appendChild(cursor);
                 setTimeout(() => {
                   cursor.remove();
                   resolve();
-                }, 600);
+                }, 300);
               }
             }, 50);
           });
         }
 
         (async function run() {
-          for (; idx < lines.length; idx++) {
-            await typeLine(lines[idx]);
+          for (; idx < links.length; idx++) {
+            await typeLine(links[idx]);
           }
         })();
       });
