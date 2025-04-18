@@ -1,1 +1,147 @@
-a
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="icon" href="../favicon.png" type="image/png">
+    <title>contact - gheat.net</title>
+    <style>
+      body {
+        background-color: #000;
+        margin: 0;
+        font-family: monospace;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .box {
+        position: relative;
+        background: #000;
+        padding: 30px;
+        border: 1px solid #fff;
+        box-shadow: 0 0 20px 2px rgba(255, 255, 255, 0.8);
+        width: 80%;
+        max-width: 700px;
+        min-height: 400px;
+        box-sizing: border-box;
+      }
+
+      .tab-group {
+        position: absolute;
+        top: -26px;
+        left: 0;
+      }
+
+      .tab-link {
+        background: #111;
+        color: white;
+        padding: 5px 12px;
+        font-size: 14px;
+        border: 1px solid #fff;
+        border-bottom: none;
+        text-decoration: none;
+        font-family: monospace;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 10px;
+        height: 1em;
+        background: white;
+        animation: blink 1s step-start infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      input, textarea {
+        background: #000;
+        border: 1px solid white;
+        color: white;
+        padding: 8px;
+        font-family: monospace;
+        resize: vertical;
+      }
+
+      button {
+        background: #000;
+        color: white;
+        border: 1px solid white;
+        padding: 8px;
+        font-family: monospace;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        width: fit-content;
+        align-self: flex-start;
+      }
+
+      button:hover {
+        background: #111;
+        box-shadow: 0 0 6px white;
+      }
+
+      .thanks-msg {
+        display: none;
+        margin-top: 20px;
+        color: white;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="tab-group">
+        <div class="tab-link">contact</div>
+      </div>
+
+      <p>contact me at <b>jaeden@gheat.net</b> or use the form (faster):</p>
+
+      <form action="https://formspree.io/f/xdkervlq" method="POST" id="contact-form">
+        <input type="text" name="name" placeholder="your name" required />
+        <input type="email" name="_replyto" placeholder="your email" required />
+        <textarea name="message" rows="4" placeholder="your message" required></textarea>
+        <button type="submit">send</button>
+      </form>
+
+      <p class="thanks-msg" id="thanks">✓ your message was sent</p>
+      <p><span class="cursor"></span></p>
+    </div>
+
+    <script>
+      const form = document.getElementById("contact-form");
+      const thanks = document.getElementById("thanks");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: data,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          form.reset();
+          thanks.style.display = "block";
+        } else {
+          alert("❌ there was an error sending your message.");
+        }
+      });
+    </script>
+  </body>
+</html>
