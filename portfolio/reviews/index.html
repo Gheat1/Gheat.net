@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gheat.net/Portfolio/Reviews</title>
+    <style>
+      body {
+        background-color: #000;
+        margin: 0;
+        font-family: monospace;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .box {
+        position: relative;
+        background: #000;
+        padding: 30px;
+        border: 1px solid #fff;
+        box-shadow: 0 0 20px 2px rgba(255,255,255,0.8);
+        width: 80%;
+        max-width: 700px;
+        min-height: 300px;
+        box-sizing: border-box;
+        overflow: visible;
+        z-index: 1;
+      }
+      .tab {
+        position: absolute;
+        top: -25px;
+        left: 0;
+        background: #111;
+        color: white;
+        padding: 5px 15px;
+        font-size: 14px;
+        border: 1px solid #fff;
+        border-bottom: none;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        z-index: 2;
+      }
+      #content p {
+        margin: 0 0 10px;
+        line-height: 1.4;
+      }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 1em;
+        background: white;
+        vertical-align: bottom;
+        animation: blink 1s step-start infinite;
+      }
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+      .nav-btn {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        border: 1px solid white;
+        background: #000;
+        color: white;
+        font-size: 14px;
+        font-family: monospace;
+        text-decoration: none;
+        transition: background 0.2s, box-shadow 0.2s;
+      }
+      .nav-btn:hover {
+        background: #111;
+        box-shadow: 0 0 8px white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="tab">Gheat.net/Portfolio/Reviews</div>
+      <div id="content"></div>
+      <a class="nav-btn" href="/portfolio/page2">&#8592; Menu</a>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const lines = [
+          "Here are a few reviews people left:",
+          "\"Damn you a whole programmer\" — bot user",
+          "\"Ruined the joke by making it possible\" — menu user",
+          "\"thanks to @Gheat for making this bot\" — server moderator",
+          "\"thx for helping me with the menu\" — menu user",
+          "\"He’s good at coding\" — random dm"
+        ];
+
+        const container = document.getElementById('content');
+        let idx = 0;
+
+        async function typeLine(text) {
+          return new Promise(resolve => {
+            const p = document.createElement('p');
+            container.appendChild(p);
+            let i = 0;
+
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+
+            const ticker = setInterval(() => {
+              if (i < text.length) {
+                p.textContent += text.charAt(i++);
+              } else {
+                clearInterval(ticker);
+                p.appendChild(cursor);
+                setTimeout(() => {
+                  cursor.remove();
+                  resolve();
+                }, 300);
+              }
+            }, 50);
+          });
+        }
+
+        (async function run() {
+          for (; idx < lines.length; idx++) {
+            await typeLine(lines[idx]);
+          }
+        })();
+      });
+    </script>
+  </body>
+</html>
