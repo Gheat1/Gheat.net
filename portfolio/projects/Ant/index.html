@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Langton's Ant - Gheat</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #222;
+            font-family: sans-serif;
+        }
+        canvas {
+            display: block;
+            border: 1px solid #555;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+         .controls label {
+            color: white;
+         }
+    </style>
+</head>
+<body>
+    <canvas id="antCanvas"></canvas>
+
+    <div class="controls">
+        <label for="speed">Speed:</label>
+        <input type="range" id="speed" min="1" max="100" value="80">
+        <button id="startButton">Start</button>
+        <button id="stopButton" disabled>Stop</button>
+        <button id="resetButton">Reset</button>
+        <button id="addAntButton">Add Ant</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('antCanvas');
+        const ctx = canvas.getContext('2d');
+        const speedControl = document.getElementById('speed');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resetButton = document.getElementById('resetButton');
+        const addAntButton = document.getElementById('addAntButton');
+
+        let grid;
+        let ants = [];
+        let simulationInterval;
+        const colors = ['#000000', '#ffffff'];
+        const antColor = '#ff0000';
+        const cellSize = 5;
+        const antVizSize = cellSize + 2;
+        let gridWidth;
+        let gridHeight;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gridWidth = Math.floor(canvas.width / cellSize);
+            gridHeight = Math.floor(canvas.height / cellSize);
+            initializeSimulation();
+        }
+
+        function initializeSimulation() {
+            grid = Array(gridWidth).fill(null).map(() => Array(gridHeight).fill(0));
+            ants = [];
+            addAnt(Math.floor(gridWidth / 2), Math.floor(gridHeight / 2), 0);
+
+            drawGrid();
+        }
+
+        function addAnt(x, y, direction) {
+            const startX = x % gridWidth;
+            const startY = y % gridHeight;
+            ants.push({ x: startX, y: startY, direction: direction });
+        }
+
+        function drawGrid() {
+             for (let x = 0; x < gridWidth; x++) {
+                for (let y = 0; y < gridHeight; y++) {
+                    ctx.fillStyle = colors[grid[x][y]];
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+            ctx.fillStyle = antColor;
+            ants.forEach(ant => {
+                const antDrawX = ant.x * cellSize - (antVizSize - cellSize) / 2;
+                const antDrawY = ant.y * cellSize - (antVizSize - cellSize) / 2;
+                ctx.fillRect(antDrawX, antDrawY, antVizSize, antVizSize);
+            });
+        }
+
+        function moveAnt(ant) {
+            const currentCellState = grid[ant.x][ant.y];
+            if (currentCellState === 0) {
+                ant.direction = (ant.direction + 1) % 4;
+                grid[ant.x][ant.y] = 1;
+            }
+            else {
+                ant.direction = (ant.direction - 1 + 4) % 4; 
+                grid[ant.x][ant.y] = 0;
+            }
+            switch (ant.direction) {
+                case 0: // Up
+                    ant.y--;
+                    break;
+                case 1: // Right
+                    ant.x++;
+                    break;
+                case 2: // Down
+                    ant.y++;
+                    break;
+                case 3: // Left
+                    ant.x--;
+                    break;
+            }
+
+            ant.x = (ant.x + gridWidth) % gridWidth;
+            ant.y = (ant.y + gridHeight) % gridHeight;
+        }
+
+        function gameLoop() {
+            ants.forEach(ant => {
+                moveAnt(ant);
+            });
+            drawGrid();
+        }
+
+        function startGame() {
+            if (!simulationInterval) {
+                const delay = 1000 / speedControl.value;
+                simulationInterval = setInterval(gameLoop, delay);
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                addAntButton.disabled = true;
+            }
+        }
+
+        function stopGame() {
+            clearInterval(simulationInterval);
+            simulationInterval = null;
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            addAntButton.disabled = false;
+        }
+
+        function resetGame() {
+            stopGame();
+            initializeSimulation();
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            addAntButton.disabled = false;
+        }
+        startButton.addEventListener('click', startGame);
+        stopButton.addEventListener('click', stopGame);
+        resetButton.addEventListener('click', resetGame);
+        addAntButton.addEventListener('click', () => {
+            const randomX = Math.floor(Math.random() * gridWidth);
+            const randomY = Math.floor(Math.random() * gridHeight);
+            const randomDirection = Math.floor(Math.random() * 4);
+            addAnt(randomX, randomY, randomDirection);
+        });
+
+        speedControl.addEventListener('input', () => {
+            if (simulationInterval) {
+                stopGame();
+                startGame();
+            }
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    </script>
+</body>
+</html>
