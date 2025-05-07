@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>3D Museum Corridor - Separate Pictures</title>
+    <title>3D Museum Corridor - Corrected Image URLs</title>
     <style>
         body { margin: 0; overflow: hidden; } /* Hide scrollbars */
         canvas { display: block; }
@@ -15,7 +15,6 @@
     <script>
         console.log("Script started.");
 
-        // --- Basic Scene Setup ---
         const scene = new THREE.Scene();
         console.log("Scene created.");
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -25,81 +24,64 @@
         document.body.appendChild(renderer.domElement);
         console.log("Renderer created and added to body.");
 
-        scene.background = new THREE.Color(0x505050); // Darker background for museum feel
+        scene.background = new THREE.Color(0x505050);
         console.log("Background color set.");
 
-        // --- Create the Museum Corridor ---
+        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x2a3439 }); //wall color
+        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x313f47 }); //floor color
+        const ceilingMaterial = new THREE.MeshPhongMaterial({ color: 0x1c1f26 }); //ceiling color
 
-        // Materials (Using your updated colors)
-        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x2a3439 }); // Your wall color
-        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x313f47 }); // Your floor color
-        const ceilingMaterial = new THREE.MeshPhongMaterial({ color: 0x1c1f26 }); // Your ceiling color
-
-        // --- NEW MATERIALS FOR PICTURE HOLDERS AND TEXT ---
-        const pictureHolderMaterial = new THREE.MeshPhongMaterial({ color: 0x404040 }); // Dark grey for picture holders
-        const textMaterial = new THREE.MeshPhongMaterial({ color: 0xbde6fb }); // Specified text color
-        // Material for the actual pictures (will have a texture map)
-        const pictureMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Start with white, texture will override
+        const pictureHolderMaterial = new THREE.MeshPhongMaterial({ color: 0x404040 }); //picture holders
+        const textMaterial = new THREE.MeshPhongMaterial({ color: 0xbde6fb }); //text color
+        const pictureMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Start with white texture will override
         console.log("Materials created, including picture holder, text, and picture materials.");
-        // --- END NEW MATERIALS ---
 
-
-        // Dimensions
         const corridorLength = 50; // Length of the corridor
         const corridorWidth = 8;  // Width of the corridor
         const corridorHeight = 6; // Height of the corridor
         const wallThickness = 0.5;
 
-        // --- Player Dimensions ---
-        const playerHeight = 1.8; // Same as camera y position (eye level)
-        const playerWidth = 0.5; // Approximate width/depth of player
+        const playerHeight = 1.8;
+        const playerWidth = 0.5;
         const playerHalfExtents = new THREE.Vector3(playerWidth / 2, playerHeight / 2, playerWidth / 2);
         console.log("Dimensions defined, including player dimensions.");
-        // --- END Player Dimensions ---
 
+        const walls = [];
 
-        // Walls
-        const walls = []; // Array to store wall meshes for collision detection
-
-        // Left Wall
         const leftWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
         const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
         leftWall.position.x = -corridorWidth / 2 - wallThickness / 2;
         leftWall.position.y = corridorHeight / 2;
         scene.add(leftWall);
-        walls.push(leftWall); // Add to walls array
+        walls.push(leftWall);
         console.log("Left wall created and added.");
 
-        // Right Wall
         const rightWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
         const rightWall = new THREE.Mesh(rightWallGeometry, wallMaterial);
         rightWall.position.x = corridorWidth / 2 + wallThickness / 2;
         rightWall.position.y = corridorHeight / 2;
         scene.add(rightWall);
-        walls.push(rightWall); // Add to walls array
+        walls.push(rightWall);
         console.log("Right wall created and added.");
 
-        // Floor
-        const floorGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2); // Use box for thickness
+        const floorGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.position.y = -wallThickness / 2; // Position it below y=0
+        floor.position.y = -wallThickness / 2;
         scene.add(floor);
         console.log("Floor created and added.");
 
-        // Ceiling
-        const ceilingGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2); // Use box for thickness
+        const ceilingGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
         const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
-        ceiling.position.y = corridorHeight + wallThickness / 2; // Position it above the walls
+        ceiling.position.y = corridorHeight + wallThickness / 2;
         scene.add(ceiling);
         console.log("Ceiling created and added.");
 
-        // Optional: Add end caps to the corridor
         const endCapGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
         const frontCap = new THREE.Mesh(endCapGeometry, wallMaterial);
         frontCap.position.z = -corridorLength / 2 - wallThickness / 2;
         frontCap.position.y = corridorHeight / 2;
         scene.add(frontCap);
-        walls.push(frontCap); // Add to walls array
+        walls.push(frontCap);
 
         const backCap = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
         const backCapMesh = new THREE.Mesh(backCap, wallMaterial);
@@ -109,52 +91,40 @@
         walls.push(backCapMesh);
         console.log("End caps created and added.");
 
-
-        // --- Add Lighting (Ambient and Directional) ---
-        const ambientLight = new THREE.AmbientLight(0xa0a3a5); // Your ambient light color
+        const ambientLight = new THREE.AmbientLight(0xa0a3a5);
         scene.add(ambientLight);
         console.log("Ambient light added.");
 
-        const directionalLight = new THREE.DirectionalLight(0xbde6fb, 0.5); // Your directional light color/intensity
-        directionalLight.position.set(0, 10, 0); // Light from above
+        const directionalLight = new THREE.DirectionalLight(0xbde6fb, 0.5);
+        directionalLight.position.set(0, 10, 0);
         scene.add(directionalLight);
         console.log("Directional light added.");
 
+        camera.position.set(-corridorWidth / 2 + 1, playerHeight, -corridorLength / 2 + 2);
 
-        // --- Camera Starting Position (Side) ---
-        camera.position.set(-corridorWidth / 2 + 1, playerHeight, -corridorLength / 2 + 2); // Example: Near front-left corner
-        // --- SET INITIAL CAMERA ROTATION TO LOOK STRAIGHT AHEAD ---
-        camera.rotation.set(0, 0, 0); // Set pitch, yaw, roll to 0
-        // Note: PointerLockControls will take over rotation after click
-        // --- END SET INITIAL CAMERA ROTATION ---
+        camera.rotation.set(0, 180, 0);
+
         console.log("Camera initial position set to:", camera.position);
         console.log("Camera initial rotation set to:", camera.rotation);
-        // --- END Camera Starting Position ---
-
-        // --- Add Picture Holders, Images, and Text ---
 
         const fontLoader = new THREE.FontLoader();
-        const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json'; // Standard example font
-        const textureLoader = new THREE.TextureLoader(); // Create texture loader
+        const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
+        const textureLoader = new THREE.TextureLoader();
 
-        // --- DEFINE IMAGE URLS HERE (Separate for Left and Right Walls) ---
+        // left & Right image URLs
         const leftImageUrls = [
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Left1.jpg?raw=true", // Replace with your first raw GitHub image URL for the left wall
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Left2.jpg?raw=true", // Replace with your second raw GitHub image URL for the left wall
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Left3.jpg?raw=true",
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Left4.jpg?raw=true",
-            // Add more URLs here if you have more pictures for the left wall
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left1.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left2.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left3.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left4.jpg",
         ];
 
         const rightImageUrls = [
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Right1.jpg?raw=true", // Replace with your first raw GitHub image URL for the right wall
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Right2.jpg?raw=true", // Replace with your second raw GitHub image URL for the right wall
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Right3.jpg?raw=true",
-            "https://github.com/Gheat1/Gheat.net/blob/main/assets/museum/Right4.jpg?raw=true",
-            // Add more URLs here if you have more pictures for the right wall
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right1.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right2.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right3.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right4.jpg",
         ];
-         // --- END DEFINE IMAGE URLS ---
-
 
         fontLoader.load(fontUrl, (font) => {
             console.log("Font loaded successfully. Creating picture holders, images, and text...");
@@ -162,163 +132,130 @@
             const pictureHolderWidth = 3;
             const pictureHolderHeight = 2;
             const pictureHolderThickness = 0.1;
-            const textHeight3D = 0.05; // Make text thinner
-            const textSize = 0.3;   // Size of the text
+            const textHeight3D = 0.05;
+            const textSize = 0.3;
 
-            const numberOfPictureSlotsPerSide = 4; // Number of picture slots on each wall
-            const spacingBetweenPictures = (corridorLength - wallThickness * 2) / (numberOfPictureSlotsPerSide + 1); // Distribute along the inner wall length
+            const numberOfPictureSlotsPerSide = 4;
+            const spacingBetweenPictures = (corridorLength - wallThickness * 2) / (numberOfPictureSlotsPerSide + 1);
 
-            // --- ADJUSTABLE DISTANCE FROM CENTER ---
-            // TWEAK THIS VALUE TO MOVE PICTURE HOLDERS CLOSER/FURTHER FROM WALLS
-            const pictureDistanceFromCenter = corridorWidth / 2 - wallThickness / 2; // Start near the inner wall edge
+            const pictureDistanceFromCenter = corridorWidth / 2 - wallThickness / 2;
             console.log("Adjustable picture distance from center:", pictureDistanceFromCenter);
-            // --- END ADJUSTABLE DISTANCE ---
 
+            const pictureBaseHeight = 1.0;
+            const pictureYPosition = pictureBaseHeight + pictureHolderHeight / 2;
+             const textOffsetFromPicture = 0.3;
+             const textYPosition = pictureBaseHeight - textOffsetFromPicture - textHeight3D / 2;
 
-            // --- ADJUSTED VERTICAL POSITION (from floor) ---
-            const pictureBaseHeight = 1.0; // Height from the floor to the bottom of the picture holder
-            const pictureYPosition = pictureBaseHeight + pictureHolderHeight / 2; // Y position of the center of the picture holder
-             const textOffsetFromPicture = 0.3; // Vertical space between picture and text
-             const textYPosition = pictureBaseHeight - textOffsetFromPicture - textHeight3D / 2; // Y position of the center of the text
-            // --- END ADJUSTED VERTICAL POSITION ---
-
-            const picturePlaneOffset = 0.02; // Small offset to place the picture plane in front of the holder
+            const picturePlaneOffset = 0.02;
 
 
             for (let i = 0; i < numberOfPictureSlotsPerSide; i++) {
-                 // --- LEFT WALL ---
-                 // Ensure we have a corresponding image URL for the left wall
+
                 if (i < leftImageUrls.length) {
-                    const leftImageUrl = leftImageUrls[i]; // Get the URL for this left picture slot
+                    const leftImageUrl = leftImageUrls[i];
                     const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
 
-
-                    // --- Left Wall Picture Holder ---
                     const leftHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
                     const leftHolder = new THREE.Mesh(leftHolderGeo, pictureHolderMaterial);
-                    // --- POSITION USING ADJUSTABLE DISTANCE ---
+
                     leftHolder.position.set(
                         -pictureDistanceFromCenter,
                         pictureYPosition,
                         zPosition
                     );
-                    // --- END POSITION USING ADJUSTABLE DISTANCE ---
+
                     scene.add(leftHolder);
 
-                    // --- Left Wall Image Plane ---
-                    console.log(`Attempting to load texture for left picture ${i + 1} from:`, leftImageUrl); // Log before loading texture
-                    textureLoader.load(leftImageUrl, (texture) => {
-                         console.log(`Texture loaded successfully for left picture ${i + 1}.`); // Log on success
 
-                         // Create material with the loaded texture
+                    console.log(`Attempting to load texture for left picture ${i + 1} from:`, leftImageUrl);
+                    textureLoader.load(leftImageUrl, (texture) => {
+                         console.log(`Texture loaded successfully for left picture ${i + 1}.`);
+
                         const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
-                        // Create a plane geometry for the image (size slightly smaller than holder)
-                        const picturePlaneWidth = pictureHolderWidth * 0.9; // 90% of holder width
-                        const picturePlaneHeight = pictureHolderHeight * 0.9; // 90% of holder height
+                        const picturePlaneWidth = pictureHolderWidth * 0.9;
+                        const picturePlaneHeight = pictureHolderHeight * 0.9;
                         const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
 
-                        // Create the picture mesh
                         const leftPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
 
-                        // --- SIMPLIFIED POSITIONING WITH TRANSLATEZ ---
-                        // Position at the holder's location
                         leftPicture.position.copy(leftHolder.position);
-                        // Rotate to face into the corridor
-                        leftPicture.rotation.y = Math.PI / 2; // 90 degrees around Y
-                        // Translate slightly forward along its local Z-axis
-                        leftPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset); // Move past holder's center + offset
-                        // --- END SIMPLIFIED POSITIONING ---
+                        leftPicture.rotation.y = Math.PI / 2;
+                        leftPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
 
                         scene.add(leftPicture);
                          console.log(`Image plane added for left picture ${i + 1}.`);
 
-                    }, undefined, // Progress callback (optional)
+                    }, undefined,
                     (err) => {
-                        console.error(`An error happened loading the texture for left picture ${i + 1}:`, err); // Log the error object
-                         console.error(err); // Log the error details
+                        console.error(`An error happened loading the texture for left picture ${i + 1}:`, err);
+                         console.error(err);
                     });
 
-
-                    // --- Left Wall Text ---
-                    const leftTextString = `Left Picture ${i + 1}`; // Updated text
+                    const leftTextString = `Left Picture ${i + 1}`;
                     const leftTextGeo = new THREE.TextGeometry(leftTextString, {
                         font: font,
                         size: textSize,
                         height: textHeight3D,
-                        curveSegments: 12, // Increase for smoother curves
+                        curveSegments: 12,
                     });
                     const leftText = new THREE.Mesh(leftTextGeo, textMaterial);
 
-                    // --- TEXT POSITIONING AND CENTERING ---
-                    leftTextGeo.center(); // Center the geometry's origin
+                    leftTextGeo.center();
                     leftText.position.set(
-                        -pictureDistanceFromCenter - (pictureHolderThickness / 2) - 0.1, // Position relative to picture holder
-                        textYPosition, // Use the calculated Y position
-                        zPosition // Align with the picture holder's Z position
+                        -pictureDistanceFromCenter - (pictureHolderThickness / 2) - 0.1,
+                        textYPosition,
+                        zPosition 
                     );
-                     leftText.rotation.y = Math.PI / 2; // Rotate to face down the corridor
-                    // --- END TEXT POSITIONING AND CENTERING ---
+                     leftText.rotation.y = Math.PI / 2; 
+
                     scene.add(leftText);
                 } else {
                     console.warn(`Not enough left image URLs provided. Skipping left picture holder and text creation for slot ${i + 1}.`);
                 }
 
-                // --- RIGHT WALL ---
-                 // Ensure we have a corresponding image URL for the right wall
                  if (i < rightImageUrls.length) {
-                    const rightImageUrl = rightImageUrls[i]; // Get the URL for this right picture slot
-                     const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1); // Recalculate zPosition for clarity
+                    const rightImageUrl = rightImageUrls[i];
+                     const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
 
-
-                    // --- Right Wall Picture Holder ---
                     const rightHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
                     const rightHolder = new THREE.Mesh(rightHolderGeo, pictureHolderMaterial);
-                    // --- POSITION USING ADJUSTABLE DISTANCE ---
+
                      rightHolder.position.set(
                          pictureDistanceFromCenter,
                          pictureYPosition,
                          zPosition
                      );
-                    // --- END POSITION USING ADJUSTABLE DISTANCE ---
+
                     scene.add(rightHolder);
 
-                    // --- Right Wall Image Plane ---
-                     console.log(`Attempting to load texture for right picture ${i + 1} from:`, rightImageUrl); // Log before loading texture
+                     console.log(`Attempting to load texture for right picture ${i + 1} from:`, rightImageUrl);
                     textureLoader.load(rightImageUrl, (texture) => {
-                        console.log(`Texture loaded successfully for right picture ${i + 1}.`); // Log on success
+                        console.log(`Texture loaded successfully for right picture ${i + 1}.`);
 
-                        // Create material with the loaded texture
                         const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
-                        // Create a plane geometry for the image (size slightly smaller than holder)
-                        const picturePlaneWidth = pictureHolderWidth * 0.9; // 90% of holder width
-                        const picturePlaneHeight = pictureHolderHeight * 0.9; // 90% of holder height
+                        const picturePlaneWidth = pictureHolderWidth * 0.9;
+                        const picturePlaneHeight = pictureHolderHeight * 0.9;
                         const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
 
-                        // Create the picture mesh
                         const rightPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
 
-                        // --- SIMPLIFIED POSITIONING WITH TRANSLATEZ ---
-                         // Position at the holder's location
                         rightPicture.position.copy(rightHolder.position);
-                         // Rotate to face into the corridor
-                        rightPicture.rotation.y = -Math.PI / 2; // -90 degrees around Y
-                        // Translate slightly forward along its local Z-axis
-                        rightPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset); // Move past holder's center + offset
-                        // --- END SIMPLIFIED POSITIONING ---
+
+                        rightPicture.rotation.y = -Math.PI / 2;
+                        rightPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
 
                         scene.add(rightPicture);
                          console.log(`Image plane added for right picture ${i + 1}.`);
 
-                    }, undefined, // Progress callback (optional)
+                    }, undefined,
                     (err) => {
-                        console.error(`An error happened loading the texture for right picture ${i + 1}:`, err); // Log the error object
-                        console.error(err); // Log the error details
+                        console.error(`An error happened loading the texture for right picture ${i + 1}:`, err);
+                        console.error(err);
                     });
 
-                    // --- Right Wall Text ---
-                    const rightTextString = `Right Picture ${i + 1}`; // Updated text
+                    const rightTextString = `Right Picture ${i + 1}`;
                     const rightTextGeo = new THREE.TextGeometry(rightTextString, {
                         font: font,
                         size: textSize,
@@ -327,15 +264,13 @@
                     });
                     const rightText = new THREE.Mesh(rightTextGeo, textMaterial);
 
-                     // --- TEXT POSITIONING AND CENTERING ---
-                     rightTextGeo.center(); // Center the geometry's origin
+                     rightTextGeo.center();
                      rightText.position.set(
-                         pictureDistanceFromCenter + (pictureHolderThickness / 2) + 0.1, // Position relative to picture holder
-                         textYPosition, // Use the calculated Y position
-                         zPosition // Align with the picture holder's Z position
+                         pictureDistanceFromCenter + (pictureHolderThickness / 2) + 0.1,
+                         textYPosition,
+                         zPosition
                      );
-                     rightText.rotation.y = -Math.PI / 2; // Rotate to face down the corridor (opposite direction)
-                    // --- END TEXT POSITIONING AND CENTERING ---
+                     rightText.rotation.y = -Math.PI / 2;
                     scene.add(rightText);
                  } else {
                      console.warn(`Not enough right image URLs provided. Skipping right picture holder and text creation for slot ${i + 1}.`);
@@ -343,22 +278,15 @@
             }
              console.log(`${numberOfPictureSlotsPerSide} picture slots processed per side.`);
         },
-        // Progress callback (optional, commented out to reduce console noise)
-        // (xhr) => {
-        //     console.log('Font loading progress:', (xhr.loaded / xhr.total * 100) + '% loaded');
-        // },
-        // Error callback
+
         (err) => {
             console.error('An error happened loading the font:', err);
         });
 
 
-        // --- First-Person Controls (using PointerLockControls) ---
-
         const controls = new THREE.PointerLockControls(camera, document.body);
         console.log("PointerLockControls created.");
 
-        // Element to display instructions (optional)
         const instructions = document.createElement('div');
         instructions.style.position = 'absolute';
         instructions.style.top = '50%';
@@ -371,42 +299,33 @@
         instructions.textContent = 'Click to Play';
         document.body.appendChild(instructions);
 
-
-        // Event listener to activate pointer lock on click
         renderer.domElement.addEventListener('click', () => {
             controls.lock();
             console.log("Attempting to lock pointer.");
         });
 
-        // Hide instructions when pointer lock is engaged
         controls.addEventListener('lock', () => {
             instructions.style.display = 'none';
             console.log("Pointer locked.");
         });
 
-        // Show instructions when pointer lock is exited
         controls.addEventListener('unlock', () => {
             instructions.style.display = 'block';
             console.log("Pointer unlocked.");
         });
 
-
-        // Keyboard state (using let because these values will change)
         let moveForward = false;
         let moveBackward = false;
         let moveLeft = false;
         let moveRight = false;
         console.log("Keyboard state variables initialized.");
 
-        // Velocity vector for smooth movement
         const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3(); // Reused for movement calculation
+        const direction = new THREE.Vector3();
         console.log("Velocity and direction vectors initialized.");
 
-         const speed = 5.0; // Adjust movement speed here
+         const speed = 5.0;
 
-
-        // Listen for keydown events
         document.addEventListener('keydown', (event) => {
             switch (event.code) {
                 case 'KeyW':
@@ -424,7 +343,6 @@
             }
         });
 
-        // Listen for keyup events
         document.addEventListener('keyup', (event) => {
             switch (event.code) {
                 case 'KeyW':
@@ -443,67 +361,49 @@
         });
         console.log("Keyboard event listeners added.");
 
-        // --- Collision Detection Setup ---
-        // Player dimensions are now defined earlier
-
-        // Create bounding boxes for walls (based on the updated 'walls' array)
         const wallBoundingBoxes = walls.map(wall => new THREE.Box3().setFromObject(wall));
         console.log("Wall bounding boxes created.");
 
-        // We will create the player bounding box inside the loop now
         console.log("Player bounding boxes initialized.");
 
-
-        // --- Animation Loop ---
         let prevTime = performance.now();
 
         function animate() {
             requestAnimationFrame(animate);
 
             const time = performance.now();
-            const delta = (time - prevTime) / 1000; // Delta time in seconds
+            const delta = (time - prevTime) / 1000;
 
-             if (controls.isLocked === true) { // Only update controls if pointer is locked
+             if (controls.isLocked === true) {
 
-                // Apply friction
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
 
-                // Calculate desired velocity based on key presses
                 velocity.z = 0;
                 velocity.x = 0;
 
-                const currentSpeed = speed; // Use the defined speed
+                const currentSpeed = speed;
 
-                if (moveForward) velocity.z += currentSpeed; // W: Move forward
-                if (moveBackward) velocity.z -= currentSpeed; // S: Move backward
-                if (moveLeft) velocity.x -= currentSpeed;    // A: Move left
-                if (moveRight) velocity.x += currentSpeed;   // D: Move right
+                if (moveForward) velocity.z += currentSpeed;
+                if (moveBackward) velocity.z -= currentSpeed;
+                if (moveLeft) velocity.x -= currentSpeed;
+                if (moveRight) velocity.x += currentSpeed;
 
-
-                // --- Collision Detection ---
-
-                // Get the camera's current position
                 const currentPosition = camera.position.clone();
 
-                // Calculate the potential next position if movement was applied without collision
                 const potentialPosition = currentPosition.clone();
-                // Calculate the movement delta based on current velocity
-                const moveDelta = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta); // Horizontal movement only
+                const moveDelta = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta);
 
-                 // Apply the movement delta based on the camera's current horizontal orientation
                 const cameraDirectionHorizontal = new THREE.Vector3();
                 camera.getWorldDirection(cameraDirectionHorizontal);
-                cameraDirectionHorizontal.y = 0; // Ignore vertical component for horizontal movement
+                cameraDirectionHorizontal.y = 0;
                 cameraDirectionHorizontal.normalize();
 
                 const right = new THREE.Vector3().crossVectors(cameraDirectionHorizontal, camera.up).normalize();
 
-                potentialPosition.addScaledVector(cameraDirectionHorizontal, moveDelta.z); // Move forward/backward relative to look direction
-                potentialPosition.addScaledVector(right, moveDelta.x); // Strafe left/right relative to look direction
+                potentialPosition.addScaledVector(cameraDirectionHorizontal, moveDelta.z);
+                potentialPosition.addScaledVector(right, moveDelta.x);
 
-
-                // Create a NEW Box3 each frame for collision check
                 const min = potentialPosition.clone().sub(playerHalfExtents);
                 const max = potentialPosition.clone().add(playerHalfExtents);
                 const tempPlayerBoundingBox = new THREE.Box3(min, max);
@@ -511,43 +411,34 @@
 
                 let collision = false;
 
-                // Check for intersection with each wall's bounding box
                 for (let i = 0; i < wallBoundingBoxes.length; i++) {
                     if (tempPlayerBoundingBox.intersectsBox(wallBoundingBoxes[i])) {
                         collision = true;
-                        // Optional: You could add logic here to slide along walls
-                        break; // No need to check other walls if a collision is found
+                        break;
                     }
                 }
 
-                // --- Apply Movement if No Collision ---
                 if (!collision) {
-                     // Apply the movement using controls' methods if no collision
                      controls.moveRight( velocity.x * delta );
                      controls.moveForward( velocity.z * delta );
                 } else {
-                    // Collision detected - movement is prevented
                 }
 
-                // Keep the player at a fixed height above the floor
-                 // Note: The player's y position (height) is independent of collision with walls.
                 camera.position.y = playerHeight;
 
 
              }
 
-            renderer.render(scene, camera); // Render the scene
+            renderer.render(scene, camera);
 
-            prevTime = time; // Update previous time for next frame
+            prevTime = performance.now();
         }
         animate();
         console.log("Animation loop started.");
 
-
-        // --- Handle Window Resizing ---
         window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight; // Corrected aspect ratio calculation
+            camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
              console.log("Window resized.");
         });
