@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Museum Corridor - DOF Attempt 3 (Conservative)</title>
+    <style>
+        body { margin: 0; overflow: hidden; } /* Hide scrollbars */
+        canvas { display: block; }
+    </style>
+    <link rel="icon" href="https://gheat.net/assets/museum/favicon.png" type="image/png">
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/TextureLoader.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/BokehPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/BokehShader.js"></script>
+    <script>
+        console.log("Script started.");
+
+        const scene = new THREE.Scene();
+        console.log("Scene created.");
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        console.log("Camera created.");
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        console.log("Renderer created and added to body.");
+
+        scene.background = new THREE.Color(0x505050);
+        console.log("Background color set.");
+
+        const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x2a3439 });
+        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x313f47 });
+        const ceilingMaterial = new THREE.MeshPhongMaterial({ color: 0x1c1f26 });
+
+        const pictureHolderMaterial = new THREE.MeshPhongMaterial({ color: 0x404040 });
+        const textMaterial = new THREE.MeshPhongMaterial({ color: 0xbde6fb });
+        const pictureMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        console.log("Materials created, including picture holder, text, and picture materials.");
+
+        const corridorLength = 50;
+        const corridorWidth = 8;
+        const corridorHeight = 6;
+        const wallThickness = 0.5;
+
+        const playerHeight = 1.8;
+        const playerWidth = 0.5;
+        const playerHalfExtents = new THREE.Vector3(playerWidth / 2, playerHeight / 2, playerWidth / 2);
+        console.log("Dimensions defined, including player dimensions.");
+
+        const walls = [];
+
+        const leftWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
+        const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
+        leftWall.position.x = -corridorWidth / 2 - wallThickness / 2;
+        leftWall.position.y = corridorHeight / 2;
+        scene.add(leftWall);
+        walls.push(leftWall);
+        console.log("Left wall created and added.");
+
+        const rightWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
+        const rightWall = new THREE.Mesh(rightWallGeometry, wallMaterial);
+        rightWall.position.x = corridorWidth / 2 + wallThickness / 2;
+        rightWall.position.y = corridorHeight / 2;
+        scene.add(rightWall);
+        walls.push(rightWall);
+        console.log("Right wall created and added.");
+
+        const floorGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.position.y = -wallThickness / 2;
+        scene.add(floor);
+        console.log("Floor created and added.");
+
+        const ceilingGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
+        const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
+        ceiling.position.y = corridorHeight + wallThickness / 2;
+        scene.add(ceiling);
+        console.log("Ceiling created and added.");
+
+        const endCapGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
+        const frontCap = new THREE.Mesh(endCapGeometry, wallMaterial);
+        frontCap.position.z = -corridorLength / 2 - wallThickness / 2;
+        frontCap.position.y = corridorHeight / 2;
+        scene.add(frontCap);
+        walls.push(frontCap);
+
+        const backCap = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
+        const backCapMesh = new THREE.Mesh(backCap, wallMaterial);
+        backCapMesh.position.z = corridorLength / 2 + wallThickness / 2;
+        backCapMesh.position.y = corridorHeight / 2;
+        scene.add(backCapMesh);
+        walls.push(backCapMesh);
+        console.log("End caps created and added.");
+
+        const ambientLight = new THREE.AmbientLight(0xa0a3a5);
+        scene.add(ambientLight);
+        console.log("Ambient light added.");
+
+        const directionalLight = new THREE.DirectionalLight(0xbde6fb, 0.5);
+        directionalLight.position.set(0, 10, 0);
+        scene.add(directionalLight);
+        console.log("Directional light added.");
+
+        camera.position.set(-corridorWidth / 2 + 1, playerHeight, -corridorLength / 2 + 2);
+
+        camera.rotation.set(0, 0, 0);
+
+        console.log("Camera initial position set to:", camera.position);
+        console.log("Camera initial rotation set to:", camera.rotation);
+
+        const fontLoader = new THREE.FontLoader();
+        const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
+        const textureLoader = new THREE.TextureLoader();
+
+        const leftImageUrls = [
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left1.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left2.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left3.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left4.jpg",
+        ];
+
+        const rightImageUrls = [
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right1.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right2.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right3.jpg",
+            "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right4.jpg",
+        ];
+
+        fontLoader.load(fontUrl, (font) => {
+            console.log("Font loaded successfully. Creating picture holders, images, and text...");
+
+            const pictureHolderWidth = 3;
+            const pictureHolderHeight = 2;
+            const pictureHolderThickness = 0.1;
+            const textHeight3D = 0.05;
+            const textSize = 0.3;
+
+            const numberOfPictureSlotsPerSide = 4;
+            const spacingBetweenPictures = (corridorLength - wallThickness * 2) / (numberOfPictureSlotsPerSide + 1);
+
+            const pictureDistanceFromCenter = corridorWidth / 2 - wallThickness / 2;
+            console.log("Adjustable picture distance from center:", pictureDistanceFromCenter);
+
+            const pictureBaseHeight = 1.0;
+            const pictureYPosition = pictureBaseHeight + pictureHolderHeight / 2;
+             const textOffsetFromPicture = 0.3;
+             const textYPosition = pictureBaseHeight - textOffsetFromPicture - textHeight3D / 2;
+
+            const picturePlaneOffset = 0.02;
+
+
+            for (let i = 0; i < numberOfPictureSlotsPerSide; i++) {
+
+                if (i < leftImageUrls.length) {
+                    const leftImageUrl = leftImageUrls[i];
+                    const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
+
+                    const leftHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
+                    const leftHolder = new THREE.Mesh(leftHolderGeo, pictureHolderMaterial);
+
+                    leftHolder.position.set(
+                        -pictureDistanceFromCenter,
+                        pictureYPosition,
+                        zPosition
+                    );
+
+                    scene.add(leftHolder);
+
+
+                    console.log(`Attempting to load texture for left picture ${i + 1} from:`, leftImageUrl);
+                    textureLoader.load(leftImageUrl, (texture) => {
+                         console.log(`Texture loaded successfully for left picture ${i + 1}.`);
+
+                        const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+                        const picturePlaneWidth = pictureHolderWidth * 0.9;
+                        const picturePlaneHeight = pictureHolderHeight * 0.9;
+                        const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
+
+                        const leftPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
+
+                        leftPicture.position.copy(leftHolder.position);
+                        leftPicture.rotation.y = Math.PI / 2;
+                        leftPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
+
+                        scene.add(leftPicture);
+                         console.log(`Image plane added for left picture ${i + 1}.`);
+
+                    }, undefined,
+                    (err) => {
+                        console.error(`An error happened loading the texture for left picture ${i + 1}:`, err);
+                         console.error(err);
+                    });
+
+                    const leftTextString = `Left Picture ${i + 1}`;
+                    const leftTextGeo = new THREE.TextGeometry(leftTextString, {
+                        font: font,
+                        size: textSize,
+                        height: textHeight3D,
+                        curveSegments: 12,
+                    });
+                    const leftText = new THREE.Mesh(leftTextGeo, textMaterial);
+
+                    leftTextGeo.center();
+                    leftText.position.set(
+                        -pictureDistanceFromCenter - (pictureHolderThickness / 2) - 0.1,
+                        textYPosition,
+                        zPosition
+                    );
+                     leftText.rotation.y = Math.PI / 2;
+
+                    scene.add(leftText);
+                } else {
+                    console.warn(`Not enough left image URLs provided. Skipping left picture holder and text creation for slot ${i + 1}.`);
+                }
+
+                 if (i < rightImageUrls.length) {
+                    const rightImageUrl = rightImageUrls[i];
+                     const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
+                    const rightHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
+                    const rightHolder = new THREE.Mesh(rightHolderGeo, pictureHolderMaterial);
+
+                     rightHolder.position.set(
+                         pictureDistanceFromCenter,
+                         pictureYPosition,
+                         zPosition
+                     );
+
+                    scene.add(rightHolder);
+
+                     console.log(`Attempting to load texture for right picture ${i + 1} from:`, rightImageUrl);
+                    textureLoader.load(rightImageUrl, (texture) => {
+                        console.log(`Texture loaded successfully for right picture ${i + 1}.`);
+
+                        const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
+
+                        const picturePlaneWidth = pictureHolderWidth * 0.9;
+                        const picturePlaneHeight = pictureHolderHeight * 0.9;
+                        const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
+
+                        const rightPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
+
+                        rightPicture.position.copy(rightHolder.position);
+
+                        rightPicture.rotation.y = -Math.PI / 2;
+                        rightPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
+
+                        scene.add(rightPicture);
+                         console.log(`Image plane added for right picture ${i + 1}.`);
+
+                    }, undefined,
+                    (err) => {
+                        console.error(`An error happened loading the texture for right picture ${i + 1}:`, err);
+                        console.error(err);
+                    });
+
+                    const rightTextString = `Right Picture ${i + 1}`;
+                    const rightTextGeo = new THREE.TextGeometry(rightTextString, {
+                        font: font,
+                        size: textSize,
+                        height: textHeight3D,
+                        curveSegments: 12,
+                    });
+                    const rightText = new THREE.Mesh(rightTextGeo, textMaterial);
+
+                     rightTextGeo.center();
+                     rightText.position.set(
+                         pictureDistanceFromCenter + (pictureHolderThickness / 2) + 0.1,
+                         textYPosition,
+                         zPosition
+                     );
+                     rightText.rotation.y = -Math.PI / 2;
+                    scene.add(rightText);
+                 } else {
+                     console.warn(`Not enough right image URLs provided. Skipping right picture holder and text creation for slot ${i + 1}.`);
+                 }
+            }
+             console.log(`${numberOfPictureSlotsPerSide} picture slots processed per side.`);
+        },
+
+        (err) => {
+            console.error('An error happened loading the font:', err);
+        });
+
+
+        const controls = new THREE.PointerLockControls(camera, document.body);
+        console.log("PointerLockControls created.");
+
+        const instructions = document.createElement('div');
+        instructions.style.position = 'absolute';
+        instructions.style.top = '50%';
+        instructions.style.left = '50%';
+        instructions.style.transform = 'translate(-50%, -50%)';
+        instructions.style.color = 'white';
+        instructions.style.fontSize = '20px';
+        instructions.style.textAlign = 'center';
+        instructions.style.cursor = 'pointer';
+        instructions.textContent = 'Click to Play';
+        document.body.appendChild(instructions);
+
+        renderer.domElement.addEventListener('click', () => {
+            controls.lock();
+            console.log("Attempting to lock pointer.");
+        });
+
+        controls.addEventListener('lock', () => {
+            instructions.style.display = 'none';
+            console.log("Pointer locked.");
+        });
+
+        controls.addEventListener('unlock', () => {
+            instructions.style.display = 'block';
+            console.log("Pointer unlocked.");
+        });
+
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+        console.log("Keyboard state variables initialized.");
+
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+        console.log("Velocity and direction vectors initialized.");
+
+         const speed = 5.0;
+
+        document.addEventListener('keydown', (event) => {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'KeyA':
+                    moveLeft = true;
+                    break;
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+                case 'KeyD':
+                    moveRight = true;
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            switch (event.code) {
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'KeyA':
+                    moveLeft = false;
+                    break;
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+                case 'KeyD':
+                    moveRight = false;
+                    break;
+            }
+        });
+        console.log("Keyboard event listeners added.");
+
+        const wallBoundingBoxes = walls.map(wall => new THREE.Box3().setFromObject(wall));
+        console.log("Wall bounding boxes created.");
+
+        console.log("Player bounding boxes initialized.");
+
+        let prevTime = performance.now();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = performance.now();
+            const delta = (time - prevTime) / 1000;
+
+             if (controls.isLocked === true) {
+
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+
+                velocity.z = 0;
+                velocity.x = 0;
+
+                const currentSpeed = speed;
+
+                if (moveForward) velocity.z += currentSpeed;
+                if (moveBackward) velocity.z -= currentSpeed;
+                if (moveLeft) velocity.x -= currentSpeed;
+                if (moveRight) velocity.x += currentSpeed;
+
+                const currentPosition = camera.position.clone();
+
+                const potentialPosition = currentPosition.clone();
+                const moveDelta = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta);
+
+                const cameraDirectionHorizontal = new THREE.Vector3();
+                camera.getWorldDirection(cameraDirectionHorizontal);
+                cameraDirectionHorizontal.y = 0;
+                cameraDirectionHorizontal.normalize();
+
+                const right = new THREE.Vector3().crossVectors(cameraDirectionHorizontal, camera.up).normalize();
+
+                potentialPosition.addScaledVector(cameraDirectionHorizontal, moveDelta.z);
+                potentialPosition.addScaledVector(right, moveDelta.x);
+
+                const min = potentialPosition.clone().sub(playerHalfExtents);
+                const max = potentialPosition.clone().add(playerHalfExtents);
+                const tempPlayerBoundingBox = new THREE.Box3(min, max);
+
+
+                let collision = false;
+
+                for (let i = 0; i < wallBoundingBoxes.length; i++) {
+                    if (tempPlayerBoundingBox.intersectsBox(wallBoundingBoxes[i])) {
+                        collision = true;
+                        break;
+                    }
+                }
+
+                if (!collision) {
+                     controls.moveRight( velocity.x * delta );
+                     controls.moveForward( velocity.z * delta );
+                } else {
+                }
+
+                camera.position.y = playerHeight;
+
+
+             }
+
+            composer.render(); // Render with composer
+
+            prevTime = time;
+        }
+
+        // --- POST-PROCESSING SETUP (Depth of Field) ---
+        const composer = new THREE.EffectComposer(renderer);
+        const renderPass = new THREE.RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        // Bokeh Pass for Depth of Field
+        const bokehPass = new THREE.BokehPass(scene, camera, {
+            focus: 5.0,    // Adjust this for where you want sharp focus
+            aperture: 0.001, // <--- Adjusted aperture to a very small value
+            maxblur: 0.01, // <--- Adjusted maxblur to a very small value
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        composer.addPass(bokehPass);
+        // --- END POST-PROCESSING SETUP ---
+
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            composer.setSize(window.innerWidth, window.innerHeight); // Update composer size
+        });
+
+        console.log("Script finished execution (setup complete).");
+
+    </script>
+</body>
+</html>
