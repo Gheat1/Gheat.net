@@ -1,99 +1,80 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../favicon.png" type="image/png">
     <title>shredsauce - gheat.net</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
-        background-color: #000;
-        margin: 0;
-        font-family: monospace;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-
-      .box {
-        position: relative;
-        background: #000;
-        padding: 30px;
-        border: 1px solid #fff;
-        width: 80%;
-        max-width: 700px;
-        min-height: 300px;
-        box-sizing: border-box;
-      }
-
-      .tab-group {
-        display: flex;
-        justify-content: space-between;
-        position: absolute;
-        top: -26px;
-        left: 0;
-        width: 100%;
-      }
-
-      .tab-left, .tab-right {
-        display: flex;
-        gap: 2px;
-      }
-
-      .tab-link {
-        background: #111;
-        color: white;
-        padding: 5px 12px;
-        font-size: 14px;
-        border: 1px solid #fff;
-        border-bottom: none;
-        text-decoration: none;
-        font-family: monospace;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
-        transition: background 0.2s;
-      }
-
-      .tab-link:hover {
-        background: #222;
-      }
-
-      .tab-link.active {
-        background: #444;
-      }
-
-      .cursor {
-        display: inline-block;
-        width: 10px;
-        height: 1em;
-        background: white;
-        animation: blink 1s step-start infinite;
-      }
-
-      @keyframes blink {
-        50% {
-          opacity: 0;
+        body {
+            font-family: 'Agave Nerd Font', 'Inter', sans-serif;
         }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="box">
-      <div class="tab-group">
-        <div class="tab-left">
-          <div class="tab-link active">/shredsauce</div>
-          <a class="tab-link" href="/shredsauce/scripts">scripts</a>
-          <a class="tab-link" href="/shredsauce/cheats">cheats</a>
-          <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
-        </div>
-        <div class="tab-right">
-        <a class="tab-link" href="https://gheat.net/">home</a>
-      </div>
-      </div>
+        .bg-custom {
+            background-image: url('../assets/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
 
-      <p>welcome to the shredsauce section</p>
-      <p>pick a tab above to explore stuff</p>
-      <p><span class="cursor"></span></p>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: inherit;
+            background-size: inherit;
+            background-position: inherit;
+            background-repeat: inherit;
+            background-attachment: inherit;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
+        .tab-link {
+            border: 1px solid rgb(156, 163, 175);
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            text-decoration: none;
+            transition: border-color 300ms;
+            border-radius: 0.5rem;
+        }
+
+        .tab-link:hover {
+            border-color: white;
+        }
+
+        .tab-link.active {
+            border-color: white;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+  <body class="bg-gray-800 text-white bg-custom">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-[#252525]/30 backdrop-blur-5xl rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full border border-white/10 overflow-hidden relative">
+            <div class="flex flex-wrap gap-2 mb-8">
+                <div class="tab-link active">/shredsauce</div>
+                <a class="tab-link" href="/shredsauce/scripts">scripts</a>
+                <a class="tab-link" href="/shredsauce/cheats">cheats</a>
+                <a class="tab-link" href="/shredsauce/tutorials">tutorials</a>
+                <div class="flex-grow"></div>
+                <a class="tab-link" href="https://gheat.net/">home</a>
+            </div>
+
+            <div class="text-gray-200 space-y-4">
+                <h1 class="text-2xl font-bold text-white mb-6">Welcome to Shredsauce</h1>
+                <p class="text-gray-200 text-sm leading-relaxed">Welcome to the shredsauce section</p>
+                <p class="text-gray-200 text-sm leading-relaxed">Pick a tab above to explore stuff</p>
+            </div>
+        </div>
     </div>
   </body>
 </html>
