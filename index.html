@@ -1,126 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link rel="icon" href="favicon.png" type="image/png">
-  <title>Gheat.net</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      font-family: monospace;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at center, #444 0%, #000 70%);
-      box-shadow: 0 0 60px rgba(255, 255, 255, 0.15) inset;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <title>Gheat.net Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Agave Nerd Font', 'Inter', sans-serif;
+        }
+        .bg-custom {
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
 
-    .box {
-      position: relative;
-      background: #000;
-      padding: 30px;
-      border: 1px solid #fff;
-      width: 80%;
-      max-width: 700px;
-      min-height: 300px;
-      box-sizing: border-box;
-      box-shadow: 0 0 40px 4px rgba(255, 255, 255, 0.4);
-    }
-
-    .tab {
-      position: absolute;
-      top: -25px;
-      left: 0;
-      background: #111;
-      color: white;
-      padding: 5px 15px;
-      font-size: 14px;
-      border: 1px solid #fff;
-      border-bottom: none;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      height: 1em;
-      background: white;
-      animation: blink 1s step-start infinite;
-      vertical-align: bottom;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-    .discord-btn {
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      padding: 8px 16px;
-      border: 1px solid white;
-      background: #000;
-      color: white;
-      font-size: 14px;
-      font-family: monospace;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .discord-btn:hover {
-      background: #111;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.015) 0,
-        rgba(255, 255, 255, 0.015) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      pointer-events: none;
-      z-index: 9999;
-      animation: scan 2s linear infinite;
-    }
-
-    @keyframes scan {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(4px); }
-    }
-  </style>
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: inherit;
+            background-size: inherit;
+            background-position: inherit;
+            background-repeat: inherit;
+            background-attachment: inherit;
+            filter: blur(20px); /* Apply blur only to the background */
+            z-index: -1; /* Ensure it stays behind all content */
+        }
+        .content-section {
+            transition: opacity 0.4s ease-in-out, max-height 0.6s ease-in-out;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+        }
+        summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 0.25rem 0;
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary::marker {
+            display: none;
+        }
+        summary::before {
+            content: '▶';
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 0.75em;
+            transition: transform 0.2s ease-in-out;
+        }
+        details[open] > summary::before {
+            transform: rotate(90deg);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <div class="box">
-    <div class="tab">gheat.net</div>
-    <p id="typeTarget"></p><span class="cursor"></span>
+<body class="bg-gray-800 text-white bg-custom">
 
-    <a class="discord-btn" href="https://gheat.net/portfolio/" target="_blank">portfolio</a>
-  </div>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div id="content-box" class="bg-[#252525]/30 backdrop-blur-5xl rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full border border-white/10 overflow-hidden">
+            <div id="main-content" class="content-section">
+                <h1 class="text-2xl font-bold text-left text-white mb-6">
+                    Gheat.net Explorer
+                </h1>
+                <p class="text-gray-200 text-xs sm:text-sm text-left leading-relaxed mb-8">
+                    Hello, My name is Jaeden or gheat online. I mainly program in Python And Javascript but know alot of other languages like HTML and CSS etc etc. This is my website of a few projects and other miscelanios stuff i have done below is my socials and the directory.
+                </p>
+                <div class="flex flex-col items-end sm:flex-row sm:justify-end gap-4">
+                    <button id="btn-directories" class="border border-gray-400 hover:border-white hover:bg-white/10 text-white font-medium py-2 px-6 rounded-lg text-center transition duration-300 shadow-lg">
+                        Directories
+                    </button>
+                    <a href="https://discord.gg/9TVm6ZFY" class="border border-gray-400 hover:border-white hover:bg-white/10 text-white font-medium py-2 px-6 rounded-lg text-center transition duration-300 shadow-lg">
+                        Discord
+                    </a>
+                    <a href="https://github.com/Gheat1" class="border border-gray-400 hover:border-white hover:bg-white/10 text-white font-medium py-2 px-6 rounded-lg text-center transition duration-300 shadow-lg">
+                        GitHub
+                    </a>
+                </div>
+            </div>
 
-  <script>
-    const text = `hi, im jaeden\nmy hobbies are coding, skiing, Future Trading, and dirtbiking.\ni can code in javascript, and html5.\nonline i go by gheat, i code scripts and mods for games, i also make a few games in my freetime.\nthanks for visiting,\njaeden`;
-    const target = document.getElementById("typeTarget");
-    let i = 0;
+            <div id="directories-content" class="content-section text-gray-200">
+                <div class="flex items-center mb-6">
+                    <button id="btn-back" class="text-2xl mr-4 text-gray-400 hover:text-white transition-colors duration-200">
+                        &larr;
+                    </button>
+                    <h2 class="text-2xl font-bold text-white">Directories</h2>
+                </div>
+                <div class="text-sm sm:text-base space-y-2">
+                    <details>
+                        <summary class="font-medium">/ (root)</summary>
+                        <div class="pl-6 space-y-1 mt-1 border-l border-gray-700">
+                            <details>
+                                <summary>projects</summary>
+                                <div class="pl-6 space-y-1 mt-1 border-l border-gray-700">
+                                    <details>
+                                        <summary>Museum</summary>
+                                        <div class="pl-6 space-y-1 mt-1 border-l border-gray-700">
+                                            <div><a href="gheat.net/assets/museum" class="text-blue-400 hover:underline">Museum</a></div>
+                                            <div><a href="gheat.net/assets/museum/beta" class="text-blue-400 hover:underline">Museum beta</a></div>
+                                        </div>
+                                    </details>
+                                    <div><a href="gheat.net/portfolio/projects/Ant" class="text-blue-400 hover:underline">Ants</a></div>
+                                    <div><a href="gheat.net/shredsauce" class="text-blue-400 hover:underline">Shredsauce</a></div>
+                                </div>
+                            </details>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    function type() {
-      if (i < text.length) {
-        target.innerHTML += text[i] === "\n" ? "<br>" : text[i];
-        i++;
-        setTimeout(type, 25); // typing speed
-      }
-    }
+    <script>
+        const mainContent = document.getElementById('main-content');
+        const directoriesContent = document.getElementById('directories-content');
+        const btnDirectories = document.getElementById('btn-directories');
+        const btnBack = document.getElementById('btn-back');
+        const detailsElements = directoriesContent.querySelectorAll('details');
 
-    window.onload = type;
-  </script>
+        window.addEventListener('load', () => {
+            mainContent.style.maxHeight = mainContent.scrollHeight + 'px';
+            mainContent.style.opacity = 1;
+            detailsElements.forEach(details => {
+                details.addEventListener('toggle', updateDirectoriesHeight);
+            });
+        });
+
+        function updateDirectoriesHeight() {
+            if (directoriesContent.style.opacity === '1') {
+                directoriesContent.style.maxHeight = directoriesContent.scrollHeight + 'px';
+            }
+        }
+
+        function showDirectories() {
+            mainContent.style.opacity = 0;
+            mainContent.style.maxHeight = '0px';
+            directoriesContent.style.maxHeight = directoriesContent.scrollHeight + 'px';
+            directoriesContent.style.opacity = 1;
+        }
+
+        function showMain() {
+            directoriesContent.style.opacity = 0;
+            directoriesContent.style.maxHeight = '0px';
+            mainContent.style.maxHeight = mainContent.scrollHeight + 'px';
+            mainContent.style.opacity = 1;
+        }
+
+        btnDirectories.addEventListener('click', showDirectories);
+        btnBack.addEventListener('click', showMain);
+
+        window.addEventListener('resize', () => {
+            if (mainContent.style.opacity === '1') {
+                mainContent.style.maxHeight = mainContent.scrollHeight + 'px';
+            }
+            if (directoriesContent.style.opacity === '1') {
+                directoriesContent.style.maxHeight = directoriesContent.scrollHeight + 'px';
+            }
+        });
+    </script>
+
 </body>
 </html>
