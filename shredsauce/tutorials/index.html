@@ -1,146 +1,128 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="icon" href="../favicon.png" type="image/png">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../favicon.png" type="image/png">
     <title>tutorials - gheat.net/shredsauce</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
-        background-color: #000;
-        margin: 0;
-        font-family: monospace;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        height: 100vh;
-        padding: 0;
-      }
-
-      .container {
-        position: relative;
-        width: 80%;
-        max-width: 800px;
-        margin-top: 60px;
-      }
-
-      .tab-bar {
-        position: absolute;
-        top: -26px;
-        left: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .tab-left {
-        display: flex;
-        gap: 0;
-      }
-
-      .tab-link {
-        background: #111;
-        color: white;
-        padding: 5px 12px;
-        font-size: 14px;
-        border: 1px solid #fff;
-        border-bottom: none;
-        text-decoration: none;
-        font-family: monospace;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
-      }
-
-      .tab-link.active {
-        background: #444;
-      }
-
-      .tab-link:hover {
-        background: #222;
-      }
-
-      .box {
-        background: #000;
-        padding: 20px;
-        border: 1px solid #fff;
-        height: 90vh;
-        overflow-y: auto;
-        box-sizing: border-box;
-      }
-
-      .tutorial {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 40px;
-        align-items: flex-start;
-      }
-
-      .tutorial iframe {
-        width: 300px;
-        height: 168px;
-        border: 1px solid #555;
-      }
-
-      .tutorial-text {
-        flex: 1;
-      }
-
-      .tutorial-title {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 6px;
-      }
-
-      .tutorial-desc {
-        font-size: 14px;
-        line-height: 1.4;
-      }
-
-      .cursor {
-        display: inline-block;
-        width: 10px;
-        height: 1em;
-        background: white;
-        animation: blink 1s step-start infinite;
-      }
-
-      @keyframes blink {
-        50% {
-          opacity: 0;
+        body {
+            font-family: 'Agave Nerd Font', 'Inter', sans-serif;
         }
-      }
+        .bg-custom {
+            background-image: url('../../assets/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: inherit;
+            background-size: inherit;
+            background-position: inherit;
+            background-repeat: inherit;
+            background-attachment: inherit;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
+        .tab-link {
+            border: 1px solid rgb(156, 163, 175);
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            text-align: center;
+            text-decoration: none;
+            transition: border-color 300ms;
+            border-radius: 0.5rem;
+        }
+
+        .tab-link:hover {
+            border-color: white;
+        }
+
+        .tab-link.active {
+            border-color: white;
+        }
+
+        .tutorial {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tutorial iframe {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tutorial-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        .tutorial-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tutorial-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tutorial-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="tab-bar">
-        <div class="tab-left">
-          <a class="tab-link" href="/shredsauce/">/shredsauce</a>
-          <a class="tab-link" href="/shredsauce/scripts">scripts</a>
-          <a class="tab-link" href="/shredsauce/cheats">cheats</a>
-          <div class="tab-link active">tutorials</div>
-        </div>
-        <a class="tab-link" href="https://gheat.net/">home</a>
-      </div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+  <body class="bg-gray-800 text-white bg-custom">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-[#252525]/30 backdrop-blur-5xl rounded-2xl shadow-2xl p-8 md:p-12 max-w-4xl w-full border border-white/10 overflow-hidden relative">
+            <div class="flex flex-wrap gap-2 mb-8">
+                <a class="tab-link" href="/shredsauce/">/shredsauce</a>
+                <a class="tab-link" href="/shredsauce/scripts">scripts</a>
+                <a class="tab-link" href="/shredsauce/cheats">cheats</a>
+                <div class="tab-link active">tutorials</div>
+                <div class="flex-grow"></div>
+                <a class="tab-link" href="https://gheat.net/">home</a>
+            </div>
 
-      <div class="box">
-        <div class="tutorial">
-          <iframe src="https://www.youtube.com/embed/bl4ZbQ955EI" frameborder="0" allowfullscreen></iframe>
-          <div class="tutorial-text">
-            <div class="tutorial-title">How to install the Dark Theme</div>
-            <div class="tutorial-desc">Step-by-step instructions for installing the Shredsauce dark theme Tampermonkey script.</div>
-          </div>
-        </div>
+            <div class="text-gray-200 space-y-4">
+                <h1 class="text-2xl font-bold text-white mb-6">Tutorials</h1>
+                <div class="tutorial-container">
+                    <div class="tutorial flex flex-col md:flex-row gap-6">
+                        <iframe class="w-full md:w-[300px] aspect-video" src="https://www.youtube.com/embed/bl4ZbQ955EI" frameborder="0" allowfullscreen></iframe>
+                        <div class="tutorial-text flex-1">
+                            <h2 class="text-lg font-bold mb-2 text-white">How to install the Dark Theme</h2>
+                            <p class="text-gray-200 text-sm leading-relaxed">Step-by-step instructions for installing the Shredsauce dark theme Tampermonkey script.</p>
+                        </div>
+                    </div>
 
-        <div class="tutorial">
-          <iframe src="https://www.youtube.com/embed/yd1OCJK_mVA" frameborder="0" allowfullscreen></iframe>
-          <div class="tutorial-text">
-            <div class="tutorial-title">Custom textures</div>
-            <div class="tutorial-desc">Step-by-Step instructions for installing custom textures into shredsauce using content overides.</div>
-          </div>
+                    <div class="tutorial flex flex-col md:flex-row gap-6">
+                        <iframe class="w-full md:w-[300px] aspect-video" src="https://www.youtube.com/embed/yd1OCJK_mVA" frameborder="0" allowfullscreen></iframe>
+                        <div class="tutorial-text flex-1">
+                            <h2 class="text-lg font-bold mb-2 text-white">Custom textures</h2>
+                            <p class="text-gray-200 text-sm leading-relaxed">Step-by-Step instructions for installing custom textures into shredsauce using content overides.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <span class="cursor"></span>
-      </div>
     </div>
   </body>
 </html>
