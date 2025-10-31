@@ -5,10 +5,29 @@
     <style>
         body { margin: 0; overflow: hidden; } /* Hide scrollbars */
         canvas { display: block; }
+        /* Page-load fade overlay */
+        #fade-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 500ms ease-in-out;
+            z-index: 9999;
+        }
+        #fade-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #fade-overlay { transition: none; }
+        }
     </style>
     <link rel="icon" href="https://gheat.net/assets/museum/favicon.png" type="image/png">
 </head>
 <body>
+    <!-- Page-load fade overlay: starts visible, fades out after load -->
+    <div id="fade-overlay" aria-hidden="true" style="background:#000;position:fixed;inset:0;opacity:1;pointer-events:auto;transition:opacity 500ms ease-in-out;z-index:9999"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
@@ -448,6 +467,42 @@
 
         console.log("Script finished execution (setup complete).");
 
+    </script>
+    <script>
+        // Fade-from-black on page load
+        (function(){
+            const overlay = document.getElementById('fade-overlay');
+            if (!overlay) return;
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function removeOverlay() {
+                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }
+            
+            function fadeOut() {
+                if (reduce) {
+                    removeOverlay();
+                    return;
+                }
+                // Wait a bit to ensure the black overlay is visible before fading
+                setTimeout(() => {
+                    // Use inline style to override the initial inline opacity
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                    
+                    function onTransitionEnd(e) {
+                        if (e.target === overlay && e.propertyName === 'opacity') {
+                            overlay.removeEventListener('transitionend', onTransitionEnd);
+                            removeOverlay();
+                        }
+                    }
+                    overlay.addEventListener('transitionend', onTransitionEnd);
+                    setTimeout(removeOverlay, 800);
+                }, 100);
+            }
+            // Trigger fade when page loads
+            window.addEventListener('load', fadeOut);
+        })();
     </script>
 </body>
 </html>
