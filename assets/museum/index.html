@@ -3,9 +3,8 @@
 <head>
     <title>portfolio</title>
     <style>
-        body { margin: 0; overflow: hidden; } /* Hide scrollbars */
+        body { margin: 0; overflow: hidden; }
         canvas { display: block; }
-        /* Page-load fade overlay */
         #fade-overlay {
             position: fixed;
             inset: 0;
@@ -26,7 +25,6 @@
     <link rel="icon" href="https://gheat.net/assets/museum/favicon.png" type="image/png">
 </head>
 <body>
-    <!-- Page-load fade overlay: starts visible, fades out after load -->
     <div id="fade-overlay" aria-hidden="true" style="background:#000;position:fixed;inset:0;opacity:1;pointer-events:auto;transition:opacity 500ms ease-in-out;z-index:9999"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
@@ -34,7 +32,6 @@
      <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/TextureLoader.js"></script>
     <script>
         console.log("Script started.");
-
         const scene = new THREE.Scene();
         console.log("Scene created.");
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -43,31 +40,24 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
         console.log("Renderer created and added to body.");
-
         scene.background = new THREE.Color(0x505050);
         console.log("Background color set.");
-
         const wallMaterial = new THREE.MeshPhongMaterial({ color: 0x2a3439 }); //wall color
         const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x313f47 }); //floor color
         const ceilingMaterial = new THREE.MeshPhongMaterial({ color: 0x1c1f26 }); //ceiling color
-
         const pictureHolderMaterial = new THREE.MeshPhongMaterial({ color: 0x404040 }); //picture holders
         const textMaterial = new THREE.MeshPhongMaterial({ color: 0xbde6fb }); //text color
         const pictureMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Start with white texture will override
         console.log("Materials created, including picture holder, text, and picture materials.");
-
         const corridorLength = 50; // Length of the corridor
         const corridorWidth = 8;  // Width of the corridor
         const corridorHeight = 6; // Height of the corridor
         const wallThickness = 0.5;
-
         const playerHeight = 1.8;
         const playerWidth = 0.5;
         const playerHalfExtents = new THREE.Vector3(playerWidth / 2, playerHeight / 2, playerWidth / 2);
         console.log("Dimensions defined, including player dimensions.");
-
         const walls = [];
-
         const leftWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
         const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
         leftWall.position.x = -corridorWidth / 2 - wallThickness / 2;
@@ -75,7 +65,6 @@
         scene.add(leftWall);
         walls.push(leftWall);
         console.log("Left wall created and added.");
-
         const rightWallGeometry = new THREE.BoxGeometry(wallThickness, corridorHeight, corridorLength);
         const rightWall = new THREE.Mesh(rightWallGeometry, wallMaterial);
         rightWall.position.x = corridorWidth / 2 + wallThickness / 2;
@@ -83,26 +72,22 @@
         scene.add(rightWall);
         walls.push(rightWall);
         console.log("Right wall created and added.");
-
         const floorGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = -wallThickness / 2;
         scene.add(floor);
         console.log("Floor created and added.");
-
         const ceilingGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, wallThickness, corridorLength + wallThickness * 2);
         const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
         ceiling.position.y = corridorHeight + wallThickness / 2;
         scene.add(ceiling);
         console.log("Ceiling created and added.");
-
         const endCapGeometry = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
         const frontCap = new THREE.Mesh(endCapGeometry, wallMaterial);
         frontCap.position.z = -corridorLength / 2 - wallThickness / 2;
         frontCap.position.y = corridorHeight / 2;
         scene.add(frontCap);
         walls.push(frontCap);
-
         const backCap = new THREE.BoxGeometry(corridorWidth + wallThickness * 2, corridorHeight, wallThickness);
         const backCapMesh = new THREE.Mesh(backCap, wallMaterial);
         backCapMesh.position.z = corridorLength / 2 + wallThickness / 2;
@@ -110,108 +95,78 @@
         scene.add(backCapMesh);
         walls.push(backCapMesh);
         console.log("End caps created and added.");
-
         const ambientLight = new THREE.AmbientLight(0xa0a3a5);
         scene.add(ambientLight);
         console.log("Ambient light added.");
-
         const directionalLight = new THREE.DirectionalLight(0xbde6fb, 0.5);
         directionalLight.position.set(0, 10, 0);
         scene.add(directionalLight);
         console.log("Directional light added.");
-
         camera.position.set(-corridorWidth / 2 + 1, playerHeight, -corridorLength / 2 + 2);
-
         camera.rotation.set(0, 180, 0);
-
         console.log("Camera initial position set to:", camera.position);
         console.log("Camera initial rotation set to:", camera.rotation);
-
         const fontLoader = new THREE.FontLoader();
         const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
         const textureLoader = new THREE.TextureLoader();
-
-        // left & Right image URLs
         const leftImageUrls = [
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left1.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left2.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left3.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Left4.jpg",
         ];
-
         const rightImageUrls = [
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right1.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right2.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right3.jpg",
             "https://raw.githubusercontent.com/Gheat1/Gheat.net/main/assets/museum/Right4.jpg",
         ];
-
         fontLoader.load(fontUrl, (font) => {
             console.log("Font loaded successfully. Creating picture holders, images, and text...");
-
             const pictureHolderWidth = 3;
             const pictureHolderHeight = 2;
             const pictureHolderThickness = 0.1;
             const textHeight3D = 0.05;
             const textSize = 0.3;
-
             const numberOfPictureSlotsPerSide = 4;
             const spacingBetweenPictures = (corridorLength - wallThickness * 2) / (numberOfPictureSlotsPerSide + 1);
-
             const pictureDistanceFromCenter = corridorWidth / 2 - wallThickness / 2;
             console.log("Adjustable picture distance from center:", pictureDistanceFromCenter);
-
             const pictureBaseHeight = 1.0;
             const pictureYPosition = pictureBaseHeight + pictureHolderHeight / 2;
              const textOffsetFromPicture = 0.3;
              const textYPosition = pictureBaseHeight - textOffsetFromPicture - textHeight3D / 2;
-
             const picturePlaneOffset = 0.02;
-
-
             for (let i = 0; i < numberOfPictureSlotsPerSide; i++) {
-
                 if (i < leftImageUrls.length) {
                     const leftImageUrl = leftImageUrls[i];
                     const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
-
                     const leftHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
                     const leftHolder = new THREE.Mesh(leftHolderGeo, pictureHolderMaterial);
-
                     leftHolder.position.set(
                         -pictureDistanceFromCenter,
                         pictureYPosition,
                         zPosition
                     );
-
                     scene.add(leftHolder);
-
-
                     console.log(`Attempting to load texture for left picture ${i + 1} from:`, leftImageUrl);
                     textureLoader.load(leftImageUrl, (texture) => {
                          console.log(`Texture loaded successfully for left picture ${i + 1}.`);
-
                         const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
-
                         const picturePlaneWidth = pictureHolderWidth * 0.9;
                         const picturePlaneHeight = pictureHolderHeight * 0.9;
                         const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
-
                         const leftPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
-
                         leftPicture.position.copy(leftHolder.position);
                         leftPicture.rotation.y = Math.PI / 2;
                         leftPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
-
                         scene.add(leftPicture);
                          console.log(`Image plane added for left picture ${i + 1}.`);
-
                     }, undefined,
                     (err) => {
                         console.error(`An error happened loading the texture for left picture ${i + 1}:`, err);
                          console.error(err);
                     });
-
                     const leftTextString = `Left Picture ${i + 1}`;
                     const leftTextGeo = new THREE.TextGeometry(leftTextString, {
                         font: font,
@@ -220,7 +175,6 @@
                         curveSegments: 12,
                     });
                     const leftText = new THREE.Mesh(leftTextGeo, textMaterial);
-
                     leftTextGeo.center();
                     leftText.position.set(
                         -pictureDistanceFromCenter - (pictureHolderThickness / 2) - 0.1,
@@ -228,53 +182,39 @@
                         zPosition 
                     );
                      leftText.rotation.y = Math.PI / 2; 
-
                     scene.add(leftText);
                 } else {
                     console.warn(`Not enough left image URLs provided. Skipping left picture holder and text creation for slot ${i + 1}.`);
                 }
-
                  if (i < rightImageUrls.length) {
                     const rightImageUrl = rightImageUrls[i];
                      const zPosition = -corridorLength / 2 + wallThickness + spacingBetweenPictures * (i + 1);
-
                     const rightHolderGeo = new THREE.BoxGeometry(pictureHolderThickness, pictureHolderHeight, pictureHolderWidth);
                     const rightHolder = new THREE.Mesh(rightHolderGeo, pictureHolderMaterial);
-
                      rightHolder.position.set(
                          pictureDistanceFromCenter,
                          pictureYPosition,
                          zPosition
                      );
-
                     scene.add(rightHolder);
-
                      console.log(`Attempting to load texture for right picture ${i + 1} from:`, rightImageUrl);
                     textureLoader.load(rightImageUrl, (texture) => {
                         console.log(`Texture loaded successfully for right picture ${i + 1}.`);
-
                         const texturedMaterial = new THREE.MeshBasicMaterial({ map: texture });
-
                         const picturePlaneWidth = pictureHolderWidth * 0.9;
                         const picturePlaneHeight = pictureHolderHeight * 0.9;
                         const picturePlaneGeo = new THREE.PlaneGeometry(picturePlaneWidth, picturePlaneHeight);
-
                         const rightPicture = new THREE.Mesh(picturePlaneGeo, texturedMaterial);
-
                         rightPicture.position.copy(rightHolder.position);
-
                         rightPicture.rotation.y = -Math.PI / 2;
                         rightPicture.translateZ(pictureHolderThickness / 2 + picturePlaneOffset);
-
                         scene.add(rightPicture);
                          console.log(`Image plane added for right picture ${i + 1}.`);
-
                     }, undefined,
                     (err) => {
                         console.error(`An error happened loading the texture for right picture ${i + 1}:`, err);
                         console.error(err);
                     });
-
                     const rightTextString = `Right Picture ${i + 1}`;
                     const rightTextGeo = new THREE.TextGeometry(rightTextString, {
                         font: font,
@@ -283,7 +223,6 @@
                         curveSegments: 12,
                     });
                     const rightText = new THREE.Mesh(rightTextGeo, textMaterial);
-
                      rightTextGeo.center();
                      rightText.position.set(
                          pictureDistanceFromCenter + (pictureHolderThickness / 2) + 0.1,
@@ -298,15 +237,11 @@
             }
              console.log(`${numberOfPictureSlotsPerSide} picture slots processed per side.`);
         },
-
         (err) => {
             console.error('An error happened loading the font:', err);
         });
-
-
         const controls = new THREE.PointerLockControls(camera, document.body);
         console.log("PointerLockControls created.");
-
         const instructions = document.createElement('div');
         instructions.style.position = 'absolute';
         instructions.style.top = '50%';
@@ -318,34 +253,27 @@
         instructions.style.cursor = 'pointer';
         instructions.textContent = 'Click to Play';
         document.body.appendChild(instructions);
-
         renderer.domElement.addEventListener('click', () => {
             controls.lock();
             console.log("Attempting to lock pointer.");
         });
-
         controls.addEventListener('lock', () => {
             instructions.style.display = 'none';
             console.log("Pointer locked.");
         });
-
         controls.addEventListener('unlock', () => {
             instructions.style.display = 'block';
             console.log("Pointer unlocked.");
         });
-
         let moveForward = false;
         let moveBackward = false;
         let moveLeft = false;
         let moveRight = false;
         console.log("Keyboard state variables initialized.");
-
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
         console.log("Velocity and direction vectors initialized.");
-
          const speed = 5.0;
-
         document.addEventListener('keydown', (event) => {
             switch (event.code) {
                 case 'KeyW':
@@ -362,7 +290,6 @@
                     break;
             }
         });
-
         document.addEventListener('keyup', (event) => {
             switch (event.code) {
                 case 'KeyW':
@@ -380,82 +307,56 @@
             }
         });
         console.log("Keyboard event listeners added.");
-
         const wallBoundingBoxes = walls.map(wall => new THREE.Box3().setFromObject(wall));
         console.log("Wall bounding boxes created.");
-
         console.log("Player bounding boxes initialized.");
-
         let prevTime = performance.now();
-
         function animate() {
             requestAnimationFrame(animate);
-
             const time = performance.now();
             const delta = (time - prevTime) / 1000;
-
              if (controls.isLocked === true) {
-
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
-
                 velocity.z = 0;
                 velocity.x = 0;
-
                 const currentSpeed = speed;
-
                 if (moveForward) velocity.z += currentSpeed;
                 if (moveBackward) velocity.z -= currentSpeed;
                 if (moveLeft) velocity.x -= currentSpeed;
                 if (moveRight) velocity.x += currentSpeed;
-
                 const currentPosition = camera.position.clone();
-
                 const potentialPosition = currentPosition.clone();
                 const moveDelta = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta);
-
                 const cameraDirectionHorizontal = new THREE.Vector3();
                 camera.getWorldDirection(cameraDirectionHorizontal);
                 cameraDirectionHorizontal.y = 0;
                 cameraDirectionHorizontal.normalize();
-
                 const right = new THREE.Vector3().crossVectors(cameraDirectionHorizontal, camera.up).normalize();
-
                 potentialPosition.addScaledVector(cameraDirectionHorizontal, moveDelta.z);
                 potentialPosition.addScaledVector(right, moveDelta.x);
-
                 const min = potentialPosition.clone().sub(playerHalfExtents);
                 const max = potentialPosition.clone().add(playerHalfExtents);
                 const tempPlayerBoundingBox = new THREE.Box3(min, max);
-
-
                 let collision = false;
-
                 for (let i = 0; i < wallBoundingBoxes.length; i++) {
                     if (tempPlayerBoundingBox.intersectsBox(wallBoundingBoxes[i])) {
                         collision = true;
                         break;
                     }
                 }
-
                 if (!collision) {
                      controls.moveRight( velocity.x * delta );
                      controls.moveForward( velocity.z * delta );
                 } else {
                 }
-
                 camera.position.y = playerHeight;
-
-
              }
-
             renderer.render(scene, camera);
-
             prevTime = performance.now();
         }
         animate();
         console.log("Animation loop started.");
-
         window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -463,33 +364,24 @@
              console.log("Window resized.");
         });
         console.log("Resize listener added.");
-
-
         console.log("Script finished execution (setup complete).");
-
     </script>
     <script>
-        // Fade-from-black on page load
         (function(){
             const overlay = document.getElementById('fade-overlay');
             if (!overlay) return;
             const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
             function removeOverlay() {
                 if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
             }
-            
             function fadeOut() {
                 if (reduce) {
                     removeOverlay();
                     return;
                 }
-                // Wait a bit to ensure the black overlay is visible before fading
                 setTimeout(() => {
-                    // Use inline style to override the initial inline opacity
                     overlay.style.opacity = '0';
                     overlay.style.pointerEvents = 'none';
-                    
                     function onTransitionEnd(e) {
                         if (e.target === overlay && e.propertyName === 'opacity') {
                             overlay.removeEventListener('transitionend', onTransitionEnd);
@@ -500,7 +392,6 @@
                     setTimeout(removeOverlay, 800);
                 }, 100);
             }
-            // Trigger fade when page loads
             window.addEventListener('load', fadeOut);
         })();
     </script>
