@@ -99,27 +99,46 @@
         (function(){
             const overlay = document.getElementById('fade-overlay');
             if (!overlay) return;
-            // If user prefers reduced motion, remove overlay immediately
+
+            // Respect users who prefer reduced motion
             const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
             function removeOverlay() {
-                // remove from DOM to avoid blocking interactions
                 if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
             }
 
-            if (reduce) {
-                removeOverlay();
-                return;
+            function fadeOut() {
+                if (reduce) {
+                    removeOverlay();
+                    return;
+                }
+
+                // Run on next frame so the browser registers the initial opaque state
+                requestAnimationFrame(() => {
+                    // Add class to trigger CSS transition
+                    overlay.classList.add('hidden');
+
+                    // Remove overlay when opacity transition ends
+                    function onTransitionEnd(e) {
+                        if (e.target === overlay && (e.propertyName === 'opacity' || e.propertyName === 'opacity ')) {
+                            overlay.removeEventListener('transitionend', onTransitionEnd);
+                            removeOverlay();
+                        }
+                    }
+                    overlay.addEventListener('transitionend', onTransitionEnd);
+
+                    // Fallback: remove after a short delay in case transitionend doesn't fire
+                    setTimeout(removeOverlay, 800);
+                });
             }
 
-            // On load, fade the overlay out then remove it
-            window.addEventListener('load', function() {
-                // Ensure the transition runs on the next frame
-                requestAnimationFrame(function() {
-                    overlay.classList.add('hidden');
-                    // Keep a fallback removal in case transitionend doesn't fire
-                    setTimeout(removeOverlay, 600);
-                });
-            });
+            // If the page already finished loading, fade immediately; otherwise wait for load
+            if (document.readyState === 'complete') {
+                // slight timeout so paint can occur with overlay visible before fading
+                setTimeout(fadeOut, 20);
+            } else {
+                window.addEventListener('load', fadeOut);
+            }
         })();
     </script>
   </body>
