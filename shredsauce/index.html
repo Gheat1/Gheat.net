@@ -52,13 +52,32 @@
         .tab-link.active {
             border-color: white;
         }
+        /* page-load fade overlay */
+        #fade-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity 500ms ease-in-out;
+            z-index: 9999;
+        }
+        #fade-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #fade-overlay { transition: none; }
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-  <body class="bg-gray-800 text-white bg-custom">
-    <div class="min-h-screen flex items-center justify-center p-4">
+    <body class="bg-gray-800 text-white bg-custom">
+        <!-- page-load overlay: starts visible, removed on load to create "fade from black" effect -->
+        <div id="fade-overlay" aria-hidden="true"></div>
+        <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-[#252525]/30 backdrop-blur-5xl rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full border border-white/10 overflow-hidden relative">
             <div class="flex flex-wrap gap-2 mb-8">
                 <div class="tab-link active">/shredsauce</div>
@@ -76,5 +95,32 @@
             </div>
         </div>
     </div>
+    <script>
+        (function(){
+            const overlay = document.getElementById('fade-overlay');
+            if (!overlay) return;
+            // If user prefers reduced motion, remove overlay immediately
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            function removeOverlay() {
+                // remove from DOM to avoid blocking interactions
+                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }
+
+            if (reduce) {
+                removeOverlay();
+                return;
+            }
+
+            // On load, fade the overlay out then remove it
+            window.addEventListener('load', function() {
+                // Ensure the transition runs on the next frame
+                requestAnimationFrame(function() {
+                    overlay.classList.add('hidden');
+                    // Keep a fallback removal in case transitionend doesn't fire
+                    setTimeout(removeOverlay, 600);
+                });
+            });
+        })();
+    </script>
   </body>
 </html>
