@@ -60,6 +60,20 @@
         details[open] > summary::before {
             transform: rotate(90deg);
         }
+        /* fade overlay */
+        #fade-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 400ms ease-in-out;
+            z-index: 50;
+        }
+        #fade-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,12 +138,23 @@
         </div>
     </div>
 
+    <!-- full screen fade overlay used when navigating from directories -->
+    <div id="fade-overlay" aria-hidden="true"></div>
+
     <script>
         const mainContent = document.getElementById('main-content');
         const directoriesContent = document.getElementById('directories-content');
         const btnDirectories = document.getElementById('btn-directories');
         const btnBack = document.getElementById('btn-back');
         const detailsElements = directoriesContent.querySelectorAll('details');
+        const fadeOverlay = document.getElementById('fade-overlay');
+        // List of internal directory hrefs (relative paths) that should fade
+        const fadeTargets = [
+            '/portfolio/projects/Ant',
+            '/shredsauce',
+            '/assets/museum',
+            '/assets/museum/beta'
+        ];
 
         window.addEventListener('load', () => {
             mainContent.style.maxHeight = mainContent.scrollHeight + 'px';
@@ -137,12 +162,53 @@
             detailsElements.forEach(details => {
                 details.addEventListener('toggle', updateDirectoriesHeight);
             });
+            // Attach delegated click handler for directory links
+            directoriesContent.addEventListener('click', handleDirectoryClick);
         });
 
         function updateDirectoriesHeight() {
             if (directoriesContent.style.opacity === '1') {
                 directoriesContent.style.maxHeight = directoriesContent.scrollHeight + 'px';
             }
+        }
+
+        // Returns true if the given anchor element should trigger the fade
+        function shouldFadeForLink(a) {
+            if (!a || !a.getAttribute) return false;
+            // Ignore links that open in a new tab/window
+            if (a.target && a.target.toLowerCase() === '_blank') return false;
+            const href = a.getAttribute('href');
+            if (!href) return false;
+            try {
+                // If href is absolute and different origin, treat as external
+                const url = new URL(href, window.location.href);
+                if (url.origin !== window.location.origin) return false;
+                // Normalize pathname (no trailing slash)
+                const path = url.pathname.replace(/\/+$/, '');
+                return fadeTargets.some(t => t.replace(/\/+$/, '') === path);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function handleDirectoryClick(e) {
+            // Only act when directories panel is visible
+            if (directoriesContent.style.opacity !== '1') return;
+            // Find closest anchor
+            const a = e.target.closest && e.target.closest('a');
+            if (!a) return;
+            if (!shouldFadeForLink(a)) return;
+
+            // Prevent default navigation and perform fade
+            e.preventDefault();
+            const href = a.href;
+            fadeOverlay.classList.add('visible');
+            // wait for transition to finish then navigate
+            const timeout = 450; // a bit longer than CSS transition
+            setTimeout(() => {
+                // Use location.assign so back button works normally
+                window.location.assign(href);
+            }, timeout);
         }
 
         function showDirectories() {
