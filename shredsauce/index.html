@@ -74,7 +74,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
     <body class="bg-gray-800 text-white bg-custom">
-        <div id="fade-overlay" aria-hidden="true"></div>
+        <div id="fade-overlay" aria-hidden="true" style="background:#000;position:fixed;inset:0;opacity:1;pointer-events:auto;transition:opacity 500ms ease-in-out;z-index:9999"></div>
         <div class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-[#252525]/30 backdrop-blur-5xl rounded-2xl shadow-2xl p-8 md:p-12 max-w-2xl w-full border border-white/10 overflow-hidden relative">
             <div class="flex flex-wrap gap-2 mb-8">
@@ -119,10 +119,13 @@
                     setTimeout(removeOverlay, 800);
                 });
             }
-            if (document.readyState === 'complete') {
-                setTimeout(fadeOut, 20);
+            // Trigger fade as early as possible (DOMContentLoaded or immediately if DOM is interactive/complete)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    requestAnimationFrame(() => setTimeout(fadeOut, 0));
+                });
             } else {
-                window.addEventListener('load', fadeOut);
+                requestAnimationFrame(() => setTimeout(fadeOut, 0));
             }
         })();
     </script>
