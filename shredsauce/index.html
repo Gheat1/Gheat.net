@@ -109,7 +109,10 @@
                 }
                 // Wait a bit to ensure the black overlay is visible before fading
                 setTimeout(() => {
-                    overlay.classList.add('hidden');
+                    // Use inline style to override the initial inline opacity
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                    
                     function onTransitionEnd(e) {
                         if (e.target === overlay && e.propertyName === 'opacity') {
                             overlay.removeEventListener('transitionend', onTransitionEnd);
