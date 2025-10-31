@@ -107,26 +107,21 @@
                     removeOverlay();
                     return;
                 }
-                requestAnimationFrame(() => {
+                // Wait a bit to ensure the black overlay is visible before fading
+                setTimeout(() => {
                     overlay.classList.add('hidden');
                     function onTransitionEnd(e) {
-                        if (e.target === overlay && (e.propertyName === 'opacity' || e.propertyName === 'opacity ')) {
+                        if (e.target === overlay && e.propertyName === 'opacity') {
                             overlay.removeEventListener('transitionend', onTransitionEnd);
                             removeOverlay();
                         }
                     }
                     overlay.addEventListener('transitionend', onTransitionEnd);
                     setTimeout(removeOverlay, 800);
-                });
+                }, 100);
             }
-            // Trigger fade as early as possible (DOMContentLoaded or immediately if DOM is interactive/complete)
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    requestAnimationFrame(() => setTimeout(fadeOut, 0));
-                });
-            } else {
-                requestAnimationFrame(() => setTimeout(fadeOut, 0));
-            }
+            // Trigger fade when page loads
+            window.addEventListener('load', fadeOut);
         })();
     </script>
   </body>
