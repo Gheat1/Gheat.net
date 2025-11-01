@@ -6,21 +6,21 @@ This is the homepage.
 ## Projects
 
 ### Museum
-'''
+```
 [The Museum](https://gheat.net/assets/museum/beta) is in HTML using THREE engine
 and is a 3d mueseum that has 8 different pictures and diferent names movements
-'''
+```
 ![Museum](https://github.com/Gheat1/Gheat.net/blob/main/assets/museum.png?raw=true)
 
 ### Ants
-'''
+```
 [Ants](https://gheat.net/portfolio/projects/Ant/)the ants project is based on the 
 Langton's ant read more here [Wiki](https://en.wikipedia.org/wiki/Langton's_ant)
-'''
+```
 ![Ants](https://github.com/Gheat1/Gheat.net/blob/main/assets/Ants.jpg?raw=true)
 
 ### Shredsauce
-'''
+```
 [Shredsauce](https://gheat.net/shredsauce) this project is making shredsauce easier
 to use by the use of scripts and very well documented cheat codes
 the script that i coded in the [scripts section](https://gheat.net/shredsauce/scripts) was a
@@ -42,7 +42,7 @@ the Sauce Server Status is a Discord bot that calls the games webservers
 to find if the servers are online and what servers are offline, this
 project taught me alot about how to use API's and how to host a bot
 this project lead to some very good internships.
-'''
+```
 ![Shredsauce](https://github.com/Gheat1/Gheat.net/blob/main/assets/Shredsauce.jpg?raw=true)
 
 
