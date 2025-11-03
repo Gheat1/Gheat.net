@@ -14,7 +14,7 @@ This is the homepage.
 
 ### Ants
 
->[Ants](https://gheat.net/portfolio/projects/Ant/)the ants project is based on the 
+>[Ants](https://gheat.net/portfolio/projects/Ant/) the ants project is based on the 
 >Langton's ant read more here [Wiki](https://en.wikipedia.org/wiki/Langton's_ant)
 
 ![Ants](https://github.com/Gheat1/Gheat.net/blob/main/assets/Ants.jpg?raw=true)
