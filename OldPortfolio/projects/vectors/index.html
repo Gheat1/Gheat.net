@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Ballistics: Range</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { margin-top: 0; color: #ffffff; text-transform: uppercase; letter-spacing: 2px; }
+        .layout-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        #gameWrapper {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background-color: #000;
+            border: 4px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        canvas { display: block; }
+        #scopeOverlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.8) 48%, #000000 100%);
+            pointer-events: none;
+        }
+        .crosshair-line { position: absolute; background-color: rgba(0,0,0,0.8); }
+        #ch-vert { left: 50%; top: 5%; bottom: 5%; width: 2px; transform: translateX(-50%); }
+        #ch-horiz { top: 50%; left: 5%; right: 5%; height: 2px; transform: translateY(-50%); }
+        .mil-dot {
+            position: absolute; width: 6px; height: 6px; 
+            background-color: rgba(0,0,0,0.8); border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #windDialContainer {
+            position: absolute;
+            top: 20px; left: 20px;
+            width: 90px; height: 90px;
+            background: rgba(40,40,40,0.7);
+            border-radius: 50%; border: 2px solid #555;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        #windArrow {
+            font-size: 28px; color: #ffcc00;
+            transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        #windText { font-size: 13px; font-weight: bold; margin-top: 2px; color: #fff;}
+        .panel {
+            background-color: #262626; padding: 20px;
+            border-radius: 8px; border: 1px solid #444;
+            text-align: left; width: 300px;
+            box-sizing: border-box;
+        }
+        .controls {
+            background-color: #262626; padding: 20px;
+            border-radius: 8px; border: 1px solid #444;
+            width: 800px; box-sizing: border-box;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        input {
+            padding: 10px; background-color: #111; color: #fff;
+            border: 1px solid #666; border-radius: 4px; font-size: 18px; width: 120px;
+            text-align: center;
+        }
+        button {
+            padding: 12px 24px; background-color: #4a4a4a; color: #fff;
+            border: 2px solid #666; border-radius: 4px; font-size: 16px;
+            cursor: pointer; font-weight: bold; transition: all 0.2s;
+        }
+        button:hover { background-color: #5a5a5a; border-color: #888; }
+        #fireBtn { background-color: #5c4033; border-color: #8a604c; color: #fff; } 
+        #fireBtn:hover { background-color: #704e3e; }
+        #retryBtn { background-color: #6b4c1a; border-color: #8c6a2d; color: #fff; display: none; } 
+        #retryBtn:hover { background-color: #856125; }
+        #resultDisplay { font-size: 22px; font-weight: bold; text-align: center; min-width: 250px;}
+        .hit { color: #4caf50; }
+        .miss { color: #f44336; }
+        code { background-color: #111; padding: 6px 10px; border-radius: 4px; color: #00ffcc; font-size: 1.1em; display: inline-block; margin-top: 10px;}
+        hr { border: 0; border-top: 1px solid #444; margin: 15px 0;}
+    </style>
+</head>
+<body>
+    <h1>Vector Ballistics</h1>
+    <div class="layout-container">
+        <div id="gameWrapper">
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
+            <div id="scopeOverlay"></div>
+            <div class="crosshair-line" id="ch-vert"></div>
+            <div class="crosshair-line" id="ch-horiz"></div>
+            <div class="mil-dot" style="left: 30%; top: 50%;"></div>
+            <div class="mil-dot" style="left: 40%; top: 50%;"></div>
+            <div class="mil-dot" style="left: 60%; top: 50%;"></div>
+            <div class="mil-dot" style="left: 70%; top: 50%;"></div>
+            <div id="windDialContainer">
+                <div id="windArrow">➤</div>
+                <div id="windText">0.0 m/s</div>
+            </div>
+        </div>
+        <div class="panel">
+            <h3 style="margin-top:0; color:#aaa;">Target Math</h3>
+            <p><strong>1. Environment Vectors:</strong></p>
+            <ul style="color:#ccc;">
+                <li>Forward Velocity: 1000 m/s</li>
+                <li>Target Distance: 1000 m</li>
+            </ul>
+            <p><strong>2. The Formula:</strong></p>
+            <p style="font-size:14px; color:#aaa;">Calculate the inverse tangent to find the exact angle of deviation.</p>
+            <code>θ = atan(Wind / 1000)</code>
+            <hr>
+            <p style="font-size: 13px; color: #888; line-height: 1.5;">
+                <strong>Hint:</strong> If wind pushes right (positive), aim left (negative degrees). If wind pushes left, aim right.
+            </p>
+        </div>
+    </div>
+    <div class="controls">
+        <div>
+            <label for="angleInput" style="font-size: 18px; margin-right: 15px; font-weight:bold;">Aim Correction (°):</label>
+            <input type="number" id="angleInput" step="0.001" value="0" autocomplete="off">
+        </div>
+        <div id="resultDisplay">Awaiting Firing Solution...</div>
+        <button id="fireBtn">FIRE</button>
+        <button id="retryBtn">Retry Shot</button>
+        <button id="nextBtn" style="display:none;">Next Target</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x242424);
+        scene.fog = new THREE.Fog(0x242424, 100, 1500);
+        const camera = new THREE.PerspectiveCamera(3, 800 / 500, 0.1, 2000);
+        camera.position.set(0, 1.8, 0); 
+        let targetCameraRotationY = 0;
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        dirLight.position.set(500, 1000, 500);
+        scene.add(dirLight);
+        const groundGeo = new THREE.PlaneGeometry(800, 2500);
+        const groundMat = new THREE.MeshLambertMaterial({ color: 0x363a2e }); 
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
+        const markerMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+        [250, 500, 750].forEach(dist => {
+            const mGeo = new THREE.BoxGeometry(2, 1, 0.5);
+            const marker = new THREE.Mesh(mGeo, markerMat);
+            marker.position.set(5, 0.5, -dist);
+            scene.add(marker);
+        });
+        const bermGeo = new THREE.BoxGeometry(60, 10, 20);
+        const bermMat = new THREE.MeshLambertMaterial({ color: 0x2e2721 });
+        const berm = new THREE.Mesh(bermGeo, bermMat);
+        berm.position.set(0, 2, -1020);
+        scene.add(berm);
+        const targetDist = -1000;
+        const targetGroup = new THREE.Group();
+        const standGeo = new THREE.CylinderGeometry(0.1, 0.1, 2);
+        const standMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+        const stand = new THREE.Mesh(standGeo, standMat);
+        stand.position.y = 1;
+        targetGroup.add(stand);
+        const plateGeo = new THREE.PlaneGeometry(1.5, 1.5);
+        const plateMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
+        const plate = new THREE.Mesh(plateGeo, plateMat);
+        plate.position.set(0, 2, 0.05);
+        targetGroup.add(plate);
+        const bullseyeGeo = new THREE.CircleGeometry(0.2, 16);
+        const bullseyeMat = new THREE.MeshBasicMaterial({ color: 0xcc0000 });
+        const bullseye = new THREE.Mesh(bullseyeGeo, bullseyeMat);
+        bullseye.position.set(0, 2, 0.06);
+        targetGroup.add(bullseye);
+        targetGroup.position.set(0, 0, targetDist);
+        scene.add(targetGroup);
+        const bulletGeo = new THREE.CylinderGeometry(0.1, 0.1, 10, 8);
+        bulletGeo.rotateX(Math.PI / 2); 
+        const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+        bullet.visible = false;
+        scene.add(bullet);
+        let currentWind = 0;
+        let isFiring = false;
+        let totalDialRotation = 0;
+        const bulletSpeed = 1000;
+        const windArrow = document.getElementById('windArrow');
+        const windText = document.getElementById('windText');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const fireBtn = document.getElementById('fireBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const angleInput = document.getElementById('angleInput');
+        function generateRound() {
+            let speed = Math.round(((Math.random() * 30) + 5) * 10) / 10;
+            const isRight = Math.random() >= 0.5;
+            currentWind = isRight ? speed : -speed;
+            const direction = isRight ? "Right" : "Left";
+            let ticks = 0;
+            windText.style.color = '#888';
+            const scrambleInterval = setInterval(() => {
+                const tempDir = Math.random() > 0.5 ? "Right" : "Left";
+                windText.textContent = `${(Math.random() * 35).toFixed(1)} ${tempDir}`;
+                ticks++;
+                if (ticks > 12) {
+                    clearInterval(scrambleInterval);
+                    windText.textContent = `${speed.toFixed(1)} ${direction}`;
+                    windText.style.color = '#fff'; 
+                }
+            }, 50);
+            const targetAngle = isRight ? 0 : 180;
+            totalDialRotation += 720; 
+            totalDialRotation = Math.floor(totalDialRotation / 360) * 360 + targetAngle;
+            windArrow.style.transform = `rotate(${totalDialRotation}deg)`;
+            resetRifle();
+        }
+        function resetRifle() {
+            resultDisplay.textContent = "Awaiting Firing Solution...";
+            resultDisplay.className = "";
+            bullet.visible = false;
+            fireBtn.style.display = "block";
+            retryBtn.style.display = "none";
+            nextBtn.style.display = "none";
+            isFiring = false;
+        }
+        function fire() {
+            if (isFiring) return;
+            isFiring = true;
+            fireBtn.style.display = "none";
+            retryBtn.style.display = "none";
+            resultDisplay.textContent = "Tracing trajectory...";
+            resultDisplay.style.color = "#aaa";
+            const inputAngleDeg = parseFloat(angleInput.value) || 0;
+            const inputAngleRad = inputAngleDeg * (Math.PI / 180);
+            bullet.position.set(0, 1.8, 0); 
+            bullet.visible = true;
+            const vZ = -bulletSpeed; 
+            const vX_bullet = bulletSpeed * Math.tan(inputAngleRad);
+            const vX_total = vX_bullet + currentWind;
+            let lastTime = performance.now();
+            function animateShot() {
+                const now = performance.now();
+                const dt = (now - lastTime) / 1000;
+                lastTime = now;
+                camera.rotation.y += (targetCameraRotationY - camera.rotation.y) * 0.1;
+                bullet.position.z += vZ * dt;
+                bullet.position.x += vX_total * dt;
+                renderer.render(scene, camera);
+                if (bullet.position.z <= targetDist) {
+                    bullet.position.z = targetDist; 
+                    checkImpact(bullet.position.x);
+                    return; 
+                }
+                requestAnimationFrame(animateShot);
+            }
+            animateShot();
+        }
+        function checkImpact(hitX) {
+            const missDistance = Math.abs(hitX);
+            if (missDistance < 0.75) { 
+                resultDisplay.textContent = "TARGET HIT!";
+                resultDisplay.className = "hit";
+                nextBtn.style.display = "block"; 
+            } else {
+                resultDisplay.textContent = `MISSED by ${missDistance.toFixed(2)}m`;
+                resultDisplay.className = "miss";
+                retryBtn.style.display = "block"; 
+            }
+        }
+        function renderIdle() {
+            if (!isFiring) {
+                camera.rotation.y += (targetCameraRotationY - camera.rotation.y) * 0.1;
+                renderer.render(scene, camera);
+            }
+            requestAnimationFrame(renderIdle);
+        }
+        fireBtn.addEventListener('click', fire);
+        retryBtn.addEventListener('click', resetRifle);
+        nextBtn.addEventListener('click', generateRound);
+        angleInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !isFiring) fire();
+        });
+        angleInput.addEventListener('input', function() {
+            const aimDeg = parseFloat(this.value) || 0;
+            const aimRad = aimDeg * (Math.PI / 180);
+            targetCameraRotationY = -aimRad; 
+            resultDisplay.textContent = "Awaiting Firing Solution...";
+            resultDisplay.className = "";
+        });
+        generateRound();
+        renderIdle();
+    </script>
+</body>
+</html>
