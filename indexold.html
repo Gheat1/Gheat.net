@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4054678418389889"
+     crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <title>gheat.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --gold: #e3a84a;
+            --gold-dim: rgba(227,168,74,0.14);
+            --card-bg: rgba(8,5,16,0.62);
+            --card-border: rgba(255,255,255,0.09);
+            --text: #f0edf8;
+            --muted: rgba(200,190,220,0.55);
+            --r: 20px;
+        }
+        html, body {
+            font-family: 'Syne', sans-serif;
+            background: #000000;
+            color: var(--text);
+            overflow: hidden;
+            height: 100%; width: 100%;
+        }
+        #canvas {
+            position: fixed; inset: 0; z-index: 0;
+            display: block;
+        }
+        #intro {
+            position: fixed; inset: 0; z-index: 300;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 9px;
+            background: #000000;
+            transition: opacity 0.8s ease;
+        }
+        #intro.out  { opacity: 0; pointer-events: none; }
+        #intro.gone { display: none; }
+        .il {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(10px,1.3vw,12.5px);
+            color: var(--gold); opacity: 0;
+            transform: translateY(4px);
+            animation: li 0.35s ease forwards;
+            letter-spacing: 0.12em;
+        }
+        .il s { text-decoration: none; color: rgba(200,190,220,0.35); }
+        @keyframes li { to { opacity:1; transform:none; } }
+        .pbar {
+            width: 140px; height: 1px;
+            background: rgba(227,168,74,0.1);
+            margin-top: 22px; overflow: hidden;
+            opacity: 0; animation: li 0.3s ease 1.6s forwards;
+        }
+        .pfill {
+            height: 100%; width: 0; background: var(--gold);
+            animation: pf 0.9s cubic-bezier(0.4,0,0.2,1) 1.8s forwards;
+        }
+        @keyframes pf { to { width:100%; } }
+        #ui {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem;
+            pointer-events: none;
+        }
+        #zoom-wrap {
+            pointer-events: none;
+            transform: scale(2.2);
+            opacity: 0;
+            transition: transform 2.8s cubic-bezier(0.16,1,0.3,1), opacity 1.6s ease;
+            width: 100%; height: 100%;
+            position: absolute; inset: 0;
+        }
+        #zoom-wrap.go { transform: scale(1); opacity: 1; }
+        #box {
+            pointer-events: auto;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(540px, calc(100vw - 3rem));
+            border-radius: var(--r);
+            padding: clamp(1.6rem,5vw,2.5rem);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-bottom-color: rgba(255,255,255,0.07);
+            border-right-color: rgba(255,255,255,0.07);
+            background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.07) 100%);
+            backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            -webkit-backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            box-shadow:
+                inset 0 1.5px 0 rgba(255,255,255,0.35),
+                inset 0 -1px 0 rgba(255,255,255,0.04),
+                inset 1px 0 0 rgba(255,255,255,0.12),
+                0 4px 30px rgba(0,0,0,0.18),
+                0 1px 4px rgba(0,0,0,0.12);
+            opacity: 0;
+            transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.16,1,0.3,1);
+            transform: translate(-50%, calc(-50% + 16px)) scale(0.97);
+        }
+        #box.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .sec { overflow:hidden; max-height:0; opacity:0; transition:opacity 0.3s ease, max-height 0.45s ease; }
+        .eye {
+            font-family:'Space Mono',monospace; font-size:10px;
+            letter-spacing:0.18em; color:var(--gold);
+            text-transform:uppercase; margin-bottom:0.65rem;
+            display:flex; align-items:center; gap:10px;
+            opacity:0; transform:translateX(-8px);
+            transition:opacity 0.5s ease 0.05s, transform 0.5s ease 0.05s;
+        }
+        .eye::before { content:''; width:18px; height:1px; background:var(--gold); opacity:0.5; flex-shrink:0; }
+        #box.show .eye { opacity:1; transform:none; }
+        h1 {
+            font-size:clamp(24px,4.5vw,33px); font-weight:800;
+            letter-spacing:-0.025em; line-height:1.08; margin-bottom:1rem;
+            opacity:0; transform:translateY(10px);
+            transition:opacity 0.55s ease 0.12s, transform 0.55s ease 0.12s;
+        }
+        #box.show h1 { opacity:1; transform:none; }
+        h1 em { font-style:normal; color:rgba(200,190,220,0.38); }
+        .bio {
+            font-size:13.5px; line-height:1.75; color:var(--muted); margin-bottom:1.6rem;
+            opacity:0; transform:translateY(8px);
+            transition:opacity 0.55s ease 0.22s, transform 0.55s ease 0.22s;
+        }
+        #box.show .bio { opacity:1; transform:none; }
+        .rule {
+            height:1px; background:rgba(255,255,255,0.06); margin-bottom:1.5rem;
+            opacity:0; transition:opacity 0.5s ease 0.3s;
+        }
+        #box.show .rule { opacity:1; }
+        .row {
+            display:flex; gap:9px; flex-wrap:wrap;
+            opacity:0; transform:translateY(6px);
+            transition:opacity 0.55s ease 0.36s, transform 0.55s ease 0.36s;
+        }
+        #box.show .row { opacity:1; transform:none; }
+        .tags {
+            display:flex; gap:7px; flex-wrap:wrap; margin-top:1.4rem;
+            opacity:0; transition:opacity 0.55s ease 0.44s;
+        }
+        #box.show .tags { opacity:1; }
+        .btn {
+            display:inline-flex; align-items:center; gap:6px;
+            font-family:'Space Mono',monospace; font-size:11px;
+            letter-spacing:0.04em; padding:8px 16px; border-radius:999px;
+            border:1px solid rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.04);
+            color:var(--text); cursor:pointer; text-decoration:none;
+            transition:background 0.18s, border-color 0.18s, transform 0.14s, box-shadow 0.18s;
+        }
+        .btn:hover { background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.22); transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+        .btn:active { transform:scale(0.96); }
+        .btn-g { background:var(--gold-dim); border-color:rgba(227,168,74,0.28); color:var(--gold); }
+        .btn-g:hover { background:rgba(227,168,74,0.22); border-color:rgba(227,168,74,0.5); }
+
+        .tag {
+            font-family:'Space Mono',monospace; font-size:10px;
+            letter-spacing:0.07em; padding:3px 9px; border-radius:999px;
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+            color:var(--muted);
+        }
+        .dhead { display:flex; align-items:center; gap:12px; margin-bottom:1.25rem; }
+        .back {
+            width:30px; height:30px; border-radius:50%;
+            border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; color:var(--muted); font-size:13px;
+            transition:background 0.18s, color 0.18s, transform 0.14s; flex-shrink:0;
+        }
+        .back:hover { background:rgba(255,255,255,0.09); color:var(--text); transform:translateX(-2px); }
+        h2 { font-size:17px; font-weight:700; letter-spacing:-0.01em; }
+        details {}
+        summary {
+            list-style:none; cursor:pointer; padding:5px 8px; border-radius:7px;
+            color:var(--muted); display:flex; align-items:center; gap:6px;
+            transition:background 0.14s, color 0.14s;
+            font-family:'Space Mono',monospace; font-size:11.5px;
+        }
+        summary::-webkit-details-marker { display:none; }
+        summary::marker { display:none; }
+        summary:hover { background:rgba(255,255,255,0.05); color:var(--text); }
+        summary::before { content:'▶'; font-size:7px; opacity:0.4; transition:transform 0.16s ease; flex-shrink:0; }
+        details[open] > summary::before { transform:rotate(90deg); }
+        details[open] > summary { color:rgba(200,190,220,0.9); }
+        .ind { padding-left:18px; border-left:1px solid rgba(255,255,255,0.05); margin-left:13px; margin-top:2px; }
+        .file {
+            display:flex; align-items:center; gap:6px;
+            padding:4px 8px; border-radius:7px;
+            font-family:'Space Mono',monospace; font-size:11.5px;
+            transition:background 0.14s;
+        }
+        .file:hover { background:rgba(255,255,255,0.04); }
+        .file::before { content:'·'; color:rgba(255,255,255,0.16); }
+        .file a { color:rgba(120,180,255,0.8); text-decoration:none; transition:color 0.14s; }
+        .file a:hover { color:#90c0ff; text-decoration:underline; }
+        #fog { position:fixed; inset:0; background:#0d0914; opacity:0; pointer-events:none; transition:opacity 400ms ease; z-index:400; }
+        #fog.on { opacity:1; pointer-events:auto; }
+        #ext-modal {
+            position: fixed; inset: 0; z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.22s ease;
+        }
+        #ext-modal.show { opacity: 1; pointer-events: auto; }
+        #ext-modal-box {
+            width: calc(100vw - 2rem);
+            height: calc(100vh - 2rem);
+            max-width: 860px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-bottom-color: rgba(255,255,255,0.07);
+            border-right-color: rgba(255,255,255,0.07);
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, rgba(8,5,16,0.97) 70%);
+            backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            -webkit-backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            box-shadow:
+                inset 0 1.5px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(255,255,255,0.04),
+                0 8px 48px rgba(0,0,0,0.6);
+            transform: translateY(12px) scale(0.98);
+            transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+        }
+        #ext-modal.show #ext-modal-box { transform: translateY(0) scale(1); }
+        #ext-modal-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+        #ext-bar-label {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+        }
+        #ext-bar-repo {
+            font-family: 'Space Mono', monospace; font-size: 11px;
+            color: var(--text); flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        #ext-modal-actions { display: flex; gap: 7px; flex-shrink: 0; }
+        #gh-content {
+            flex: 1; overflow-y: auto; padding: 1.6rem;
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        #gh-loading {
+            display: flex; align-items: center; justify-content: center;
+            height: 100%; gap: 10px;
+            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+        }
+        .gh-spinner {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid rgba(227,168,74,0.2);
+            border-top-color: var(--gold);
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #gh-header { margin-bottom: 1.4rem; }
+        #gh-repo-name {
+            font-size: 20px; font-weight: 800; letter-spacing: -0.02em;
+            margin-bottom: 0.4rem; display: flex; align-items: center; gap: 10px;
+        }
+        #gh-repo-name svg { opacity: 0.4; flex-shrink: 0; }
+        #gh-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 1rem; }
+        #gh-meta {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            font-family: 'Space Mono', monospace; font-size: 10.5px; color: var(--muted);
+        }
+        .gh-meta-item { display: flex; align-items: center; gap: 5px; }
+        .gh-meta-item span { color: var(--text); }
+        #gh-topics { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.9rem; }
+        .gh-rule { height: 1px; background: rgba(255,255,255,0.06); margin: 1.4rem 0; }
+        #gh-files-title {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;
+        }
+        #gh-files-title::before { content:''; width:14px; height:1px; background:var(--gold); opacity:0.5; }
+        #gh-tree {
+            font-family: 'Space Mono', monospace; font-size: 11.5px;
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            overflow: hidden; margin-bottom: 1.4rem;
+        }
+        .gh-tree-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 14px; color: var(--muted);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.12s;
+        }
+        .gh-tree-row:last-child { border-bottom: none; }
+        .gh-tree-row:hover { background: rgba(255,255,255,0.03); }
+        .gh-tree-row .name { color: var(--text); flex: 1; }
+        .gh-tree-row .type-icon { opacity: 0.45; font-size: 12px; width: 14px; text-align: center; }
+        .gh-tree-row .msg { flex: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; }
+        .gh-tree-row .date { font-size: 10px; opacity: 0.5; }
+        #gh-readme-title {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;
+        }
+        #gh-readme-title::before { content:''; width:14px; height:1px; background:var(--gold); opacity:0.5; }
+        #gh-readme {
+            font-size: 13px; line-height: 1.8; color: rgba(200,190,220,0.75);
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            padding: 1.2rem 1.4rem; white-space: pre-wrap; word-break: break-word;
+        }
+        #gh-readme h1,#gh-readme h2,#gh-readme h3 {
+            color: var(--text); font-weight: 700; margin: 1rem 0 0.4rem;
+            letter-spacing: -0.01em;
+        }
+        #gh-readme h1 { font-size: 17px; } #gh-readme h2 { font-size: 15px; } #gh-readme h3 { font-size: 13px; }
+        #gh-readme code {
+            font-family: 'Space Mono', monospace; font-size: 10.5px;
+            background: rgba(255,255,255,0.06); border-radius: 4px; padding: 1px 5px;
+        }
+        #gh-readme pre {
+            background: rgba(0,0,0,0.35); border-radius: 8px; padding: 1rem;
+            overflow-x: auto; margin: 0.8rem 0;
+        }
+        #gh-readme pre code { background: none; padding: 0; }
+        #gh-readme a { color: rgba(120,180,255,0.8); }
+        #gh-readme hr { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 1rem 0; }
+        #gh-readme ul,#gh-readme ol { padding-left: 1.4rem; }
+        #gh-releases-title {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;
+        }
+        #gh-releases-title::before { content:''; width:14px; height:1px; background:var(--gold); opacity:0.5; }
+        .gh-release {
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            padding: 1rem 1.2rem; margin-bottom: 0.7rem;
+            transition: background 0.14s;
+        }
+        .gh-release:hover { background: rgba(255,255,255,0.03); }
+        .gh-release-top { display: flex; align-items: center; gap: 10px; margin-bottom: 0.35rem; flex-wrap: wrap; }
+        .gh-release-tag {
+            font-family: 'Space Mono', monospace; font-size: 11px;
+            color: var(--gold); font-weight: 700;
+        }
+        .gh-release-name { font-size: 13px; font-weight: 700; flex: 1; }
+        .gh-release-date {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            color: var(--muted);
+        }
+        .gh-release-badge {
+            font-family: 'Space Mono', monospace; font-size: 9px;
+            letter-spacing: 0.08em; padding: 2px 7px; border-radius: 999px;
+            background: rgba(227,168,74,0.14); border: 1px solid rgba(227,168,74,0.28);
+            color: var(--gold);
+        }
+        .gh-release-body {
+            font-size: 12px; color: var(--muted); line-height: 1.7;
+            margin-top: 0.4rem;
+        }
+        .gh-release-assets {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.7rem;
+        }
+        .gh-asset-btn {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            padding: 4px 10px; border-radius: 6px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+            color: var(--muted); text-decoration: none;
+            transition: background 0.14s, color 0.14s;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .gh-asset-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+        #ss-modal {
+            position: fixed; inset: 0; z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.22s ease;
+        }
+        #ss-modal.show { opacity: 1; pointer-events: auto; }
+        #ss-modal-box {
+            width: calc(100vw - 2rem);
+            height: calc(100vh - 2rem);
+            max-width: 860px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-bottom-color: rgba(255,255,255,0.07);
+            border-right-color: rgba(255,255,255,0.07);
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, rgba(8,5,16,0.97) 70%);
+            backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            -webkit-backdrop-filter: blur(10px) saturate(1.8) brightness(1.25) contrast(0.97);
+            box-shadow:
+                inset 0 1.5px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(255,255,255,0.04),
+                0 8px 48px rgba(0,0,0,0.6);
+            transform: translateY(12px) scale(0.98);
+            transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+        }
+        #ss-modal.show #ss-modal-box { transform: translateY(0) scale(1); }
+        #ss-modal-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+        #ss-bar-label {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+        }
+        #ss-bar-page {
+            font-family: 'Space Mono', monospace; font-size: 11px;
+            color: var(--text); flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        #ss-modal-actions { display: flex; gap: 7px; flex-shrink: 0; }
+        #ss-content {
+            flex: 1; overflow-y: auto; padding: 1.6rem;
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        .ss-page-head { margin-bottom: 1rem; }
+        .ss-page-title { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+        .ss-page-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+        #ss-files-title {
+            font-family: 'Space Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
+            margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;
+        }
+        #ss-files-title::before { content:''; width:14px; height:1px; background:var(--gold); opacity:0.5; }
+        #ss-tree {
+            font-family: 'Space Mono', monospace; font-size: 11.5px;
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            overflow: hidden; margin-bottom: 1.4rem;
+        }
+        .ss-btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.5rem; }
+        .ss-cheat-block {
+            font-family: 'Space Mono', monospace; font-size: 11.5px;
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            padding: 1.2rem 1.4rem; color: var(--muted); line-height: 1.8;
+            white-space: pre-wrap; word-break: break-word;
+        }
+        .ss-cheat-block pre { font-family: inherit; font-size: inherit; white-space: pre-wrap; word-break: break-word; }
+        .ss-tutorial {
+            display: flex; gap: 1.2rem; align-items: flex-start;
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
+            padding: 1.2rem; margin-bottom: 1rem;
+            transition: background 0.14s;
+        }
+        .ss-tutorial:hover { background: rgba(255,255,255,0.02); }
+        .ss-tutorial-vid { flex-shrink: 0; width: 240px; }
+        .ss-tutorial-vid iframe { width: 100%; aspect-ratio: 16/9; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        .ss-tutorial-text { flex: 1; }
+        .ss-tut-title { font-size: 14px; font-weight: 700; margin-bottom: 0.4rem; color: var(--text); }
+        .ss-tut-desc { font-size: 12px; color: var(--muted); line-height: 1.7; }
+        @media (max-width: 560px) {
+            .ss-tutorial { flex-direction: column; }
+            .ss-tutorial-vid { width: 100%; }
+        }
+        #gh-error {
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; height: 100%; gap: 12px; text-align: center;
+            font-family: 'Space Mono', monospace;
+        }
+        #gh-error.show { display: flex; }
+        #gh-error p { color: var(--muted); font-size: 11px; line-height: 1.8; }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="ui">
+    <div id="box">
+        <div id="main" class="sec">
+            <div class="eye">gheat.net</div>
+            <h1>gheat.net<br><em></em></h1>
+            <p class="bio">I'm Jaeden, My username online is gheat. I am best at JS, HTML, CSS, and alot of other random languages, This is where you will find projects, experiments, and alot of random stuff.</p>
+            <div class="rule"></div>
+            <div class="row">
+                <button id="btnDir" class="btn btn-g">
+                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="1" y1="3" x2="11" y2="3"/><line x1="1" y1="6" x2="8" y2="6"/><line x1="1" y1="9" x2="9.5" y2="9"/></svg>
+                    Directories
+                </button>
+                <a href="https://discord.gg/9TVm6ZFY" class="btn">
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13.1 3a11.2 11.2 0 0 0-2.8-.9l-.1.2a7.8 7.8 0 0 0-2.1.7 7.8 7.8 0 0 0-2.1-.7l-.1-.2A11.2 11.2 0 0 0 5.1 3C3.4 5.7 2.8 8.3 3 10.8a11.3 11.3 0 0 0 3.5 1.8 8.4 8.4 0 0 0 .7-1.2l-1.1-.4.3-.6 1.1.5a8 8 0 0 0 5 0l1.1-.5.3.6-1.1.4a8.4 8.4 0 0 0 .7 1.2 11.3 11.3 0 0 0 3.5-1.8c.2-2.8-.4-5.4-2-7.8zM5.9 9.4c-.6 0-1.1-.6-1.1-1.3s.5-1.3 1.1-1.3 1.1.6 1.1 1.3-.5 1.3-1.1 1.3zm4.2 0c-.6 0-1.1-.6-1.1-1.3s.5-1.3 1.1-1.3 1.1.6 1.1 1.3-.5 1.3-1.1 1.3z"/></svg>
+                    Discord
+                </a>
+                <a href="https://github.com/Gheat1" class="btn">
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .5a7.5 7.5 0 0 0-2.4 14.6c.4.1.5-.2.5-.4v-1.4c-2 .4-2.5-.5-2.6-1 0-.1-.5-.9-1-1.1-.3-.2-.8-.6 0-.6.8 0 1.3.7 1.5 1 .9 1.5 2.3 1 2.8.8.1-.6.3-1 .6-1.3-2.2-.3-4.5-1.1-4.5-4.9 0-1.1.4-2 1-2.7 0-.3-.5-1.3.1-2.7 0 0 .8-.3 2.8 1a9.4 9.4 0 0 1 5 0c2-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.8-2.3 4.6-4.5 4.9.4.3.7 1 .7 2v2.9c0 .2.1.5.5.4A7.5 7.5 0 0 0 8 .5z"/></svg>
+                    GitHub
+                </a>
+            </div>
+            <div class="tags">
+                <div class="tag">Python</div><div class="tag">Javascript</div>
+                <div class="tag">HTML / CSS</div><div class="tag">C Family</div>
+            </div>
+        </div>
+        <div id="dirs" class="sec">
+            <div class="dhead">
+                <button id="btnBack" class="back" aria-label="Go back">&#8592;</button>
+                <h2>Directories</h2>
+            </div>
+            <div>
+                <details>
+                    <summary>&#128193; /home</summary>
+                    <div class="ind">
+                        <details>
+                            <summary>&#128193; /projects</summary>
+                            <div class="ind">
+                                <details>
+                                    <summary>&#128193; /Museum</summary>
+                                    <div class="ind">
+                                        <div class="file"><a href="/assets/museum">Museum</a></div>
+                                        <div class="file"><a href="/assets/museum/beta">Museum beta</a></div>
+                                    </div>
+                                </details>
+                                <details>
+                                    <summary>&#128193; /shredsauce</summary>
+                                    <div class="ind">
+                                        <div class="file"><a href="#" data-ss="scripts">scripts</a></div>
+                                        <div class="file"><a href="#" data-ss="cheats">cheats</a></div>
+                                        <div class="file"><a href="#" data-ss="tutorials">tutorials</a></div>
+                                    </div>
+                                </details>
+				<div class="file"><a href="/spaceships">Spaceships !NEW!</a></div>
+				<div class="file"><a href="/portfolio/projects/Ant">Ants</a></div>
+                                <div class="file"><a href="https://github.com/Gheat1/SauceServerStatus">SauceServerStatus</a></div>
+                                <div class="file"><a href="https://github.com/Gheat1/T480">T480</a></div>
+                                <div class="file"><a href="https://github.com/Gheat1/Gheat.net">gheat.net repo</a></div>
+                                <div class="file"><a href="https://github.com/Gheat1/void-watch">void-watch</a></div>
+                            </div>
+                        </details>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="intro">
+    <div class="il" style="animation-delay:0.1s"><s>// </s>loading gheat.net</div>
+    <div class="il" style="animation-delay:0.5s"><s>$ </s>rendering 3d space</div>
+    <div class="il" style="animation-delay:1.0s"><s>✓ </s>finishing up</div>
+    <div class="pbar"><div class="pfill"></div></div>
+</div>
+<div id="ext-modal" role="dialog" aria-modal="true">
+    <div id="ext-modal-box">
+        <div id="ext-modal-bar">
+            <span id="ext-bar-label">github</span>
+            <span id="ext-bar-repo"></span>
+            <div id="ext-modal-actions">
+                <a id="ext-open" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-g" style="font-size:10px;padding:5px 12px;">Open ↗</a>
+                <button id="ext-cancel" class="btn" style="font-size:10px;padding:5px 12px;">✕</button>
+            </div>
+        </div>
+        <div id="gh-content">
+            <div id="gh-loading"><div class="gh-spinner"></div> fetching repo...</div>
+            <div id="gh-error"><p></p><a id="gh-error-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-g">Open on GitHub ↗</a></div>
+            <div id="gh-body" style="display:none;">
+                <div id="gh-header">
+                    <div id="gh-repo-name">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 .5a7.5 7.5 0 0 0-2.4 14.6c.4.1.5-.2.5-.4v-1.4c-2 .4-2.5-.5-2.6-1 0-.1-.5-.9-1-1.1-.3-.2-.8-.6 0-.6.8 0 1.3.7 1.5 1 .9 1.5 2.3 1 2.8.8.1-.6.3-1 .6-1.3-2.2-.3-4.5-1.1-4.5-4.9 0-1.1.4-2 1-2.7 0-.3-.5-1.3.1-2.7 0 0 .8-.3 2.8 1a9.4 9.4 0 0 1 5 0c2-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.8-2.3 4.6-4.5 4.9.4.3.7 1 .7 2v2.9c0 .2.1.5.5.4A7.5 7.5 0 0 0 8 .5z"/></svg>
+                        <span id="gh-name-text"></span>
+                    </div>
+                    <div id="gh-desc"></div>
+                    <div id="gh-meta">
+                        <div class="gh-meta-item">⭐ <span id="gh-stars"></span></div>
+                        <div class="gh-meta-item">⑂ <span id="gh-forks"></span></div>
+                        <div class="gh-meta-item">◉ <span id="gh-lang"></span></div>
+                        <div class="gh-meta-item">⊙ <span id="gh-license"></span></div>
+                    </div>
+                    <div id="gh-topics"></div>
+                </div>
+                <div class="gh-rule"></div>
+                <div id="gh-files-title">files</div>
+                <div id="gh-tree"></div>
+                <div id="gh-releases-title" style="display:none;">releases</div>
+                <div id="gh-releases"></div>
+                <div id="gh-readme-title">readme</div>
+                <div id="gh-readme"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="ss-modal" role="dialog" aria-modal="true">
+    <div id="ss-modal-box">
+        <div id="ss-modal-bar">
+            <span id="ss-bar-label">shredsauce</span>
+            <span id="ss-bar-page"></span>
+            <div id="ss-modal-actions">
+                <a id="ss-open" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-g" style="font-size:10px;padding:5px 12px;">Open ↗</a>
+                <button id="ss-cancel" class="btn" style="font-size:10px;padding:5px 12px;">✕</button>
+            </div>
+        </div>
+        <div id="ss-content">
+            <div id="ss-page-scripts" class="ss-page" style="display:none;">
+                <div class="ss-page-head">
+                    <div class="ss-page-title">Scripts / Themes</div>
+                    <p class="ss-page-sub">Install tutorials in tutorials tab, must have Ublock.</p>
+                </div>
+                <div class="gh-rule"></div>
+                <div id="ss-files-title">scripts</div>
+                <div id="ss-tree">
+                    <div class="gh-tree-row"><span class="type-icon">📄</span><span class="name"><a href="/shredsauce/scripts/Shredsauce%20dark%20Theme-2.0.5Beta.user.js" target="_blank" rel="noopener">Shredsauce dark Theme-2.0.5Beta.user.js</a></span></div>
+                    <div class="gh-tree-row"><span class="type-icon">📄</span><span class="name"><a href="/shredsauce/scripts/SDT2.1.0Dev-Beta.user.js" target="_blank" rel="noopener">SDT2.1.0Dev-Beta.user.js</a></span></div>
+                </div>
+                <div class="gh-rule"></div>
+                <div id="ss-files-title">install</div>
+                <div class="ss-btn-row">
+                    <a href="/shredsauce/scripts/Shredsauce%20dark%20Theme-2.0.5Beta.user.js" class="btn btn-g">&#11123; Install Dark Theme Script</a>
+                    <a href="/shredsauce/scripts/SDT2.1.0Dev-Beta.user.js" class="btn btn-g">&#11123; Install Dark Theme Dev Beta</a>
+                </div>
+            </div>
+            <div id="ss-page-cheats" class="ss-page" style="display:none;">
+                <div class="ss-page-head">
+                    <div class="ss-page-title">Cheats List</div>
+                </div>
+                <div class="gh-rule"></div>
+                <div class="ss-cheat-block"><pre>
+✦ Cheats
+(DNW) – does not work anymore
+
+✦ 1 Skier
+  1.1 Physics
+    cementfeet - locks you into place
+    dontcrash - you don't crash
+    superspin - spin fast
+    lowgravity - low gravity
+    reedspeedman - Removes speed cap
+
+  1.2 Miscellaneous
+    Turpinturning - turns head when switching directions
+    Harrypottercloak - invisible character
+    Startboosted - hit tab &amp; saves speed. after respawn u keep it
+
+✦ 2 Grabs
+  Animpacktest - test different grab packs
+  Showallposeslots - set more grabs
+  grabselectorparams - animated grabs
+  Tempforcesave - save the grab if broken
+
+✦ 3 Gear
+  Gearpacktest - test different gear packs (DNW)
+  remotefeatures - cool features for maps and gear
+  Tempforcesave - save the gear if broken
+  cleanthatshit - Fix Corrupted Gear
+
+✦ 4 Visuals
+  Starrynight - starry night
+  Badtripsky - green screen sky
+  nightmodetest - switch between night and day
+  oldschoolgraphics - old graphics
+
+✦ 5 Maps
+  5.1 Editor
+    remotefeatures - cool features for maps and gear
+    Customfeatures - make copy and paste features
+    Showownfeatures - pasting features
+    Tempforcesave - save the map if broken
+    Mapoffset - shift map around
+    Skypaintertest - Paint custom sky (DNW)
+
+  5.2 Game
+    Bluescreenfix - fixes old maps
+    Flippityflip - flips map
+    Powday - makes it pow
+
+✦ 6 Filming / Camera
+  6.1 Camera
+    slowbrocamera - first person
+    cooldronedawg - drone camera
+    Isometricmode - top down view
+
+  6.2 Filming
+    Eheathplz - camera in hand
+    camerasteeze - filming
+    nomoreui - gets rid of UI
+    Replaytest - replay
+    Sunsetshoot - sunset (DNW)
+
+✦ 7 Online Related
+  Savingprivateroom - passwords on rooms
+  Andyparry - lag everyone skis everywhere
+  Nonamebrandsauce - no name in multiplayer
+
+✦ 8 Miscellaneous
+  Targetfps(fps number) - smoother feel (60 = consistent / 240 = butter)
+  scootermcpooter - scooter
+  StopOz187 - unsure (DNW)
+  SNWSK8 - use in APT with snowboard
+  Debugotron - debugger for errors
+
+✦ Credits
+  QuintCork - Made the research a lot easier
+  Dog.. - TargetFps Suggestion
+                </pre></div>
+            </div>
+            <div id="ss-page-tutorials" class="ss-page" style="display:none;">
+                <div class="ss-page-head">
+                    <div class="ss-page-title">Tutorials</div>
+                </div>
+                <div class="gh-rule"></div>
+                <div class="ss-tutorial">
+                    <div class="ss-tutorial-vid">
+                        <iframe src="https://www.youtube-nocookie.com/embed/bl4ZbQ955EI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="How to install the Dark Theme"></iframe>
+                    </div>
+                    <div class="ss-tutorial-text">
+                        <div class="ss-tut-title">How to install the Dark Theme</div>
+                        <p class="ss-tut-desc">Step-by-step instructions for installing the Shredsauce dark theme Tampermonkey script.</p>
+                    </div>
+                </div>
+                <div class="ss-tutorial">
+                    <div class="ss-tutorial-vid">
+                        <iframe src="https://www.youtube-nocookie.com/embed/yd1OCJK_mVA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Custom textures"></iframe>
+                    </div>
+                    <div class="ss-tutorial-text">
+                        <div class="ss-tut-title">Custom textures</div>
+                        <p class="ss-tut-desc">Step-by-step instructions for installing custom textures into shredsauce using content overrides.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="fog" aria-hidden="true"></div>
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.skypack.dev/three@0.136.0",
+        "three/examples/jsm/controls/OrbitControls": "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls"
+    }
+}
+</script>
+<script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+    const canvas = document.getElementById('canvas');
+    const scene  = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 1, 1000);
+    const CAM_START_Z = 6;
+    const CAM_END_Z   = 21;
+    camera.position.set(0, 4, CAM_START_Z);
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    window.addEventListener("resize", () => {
+        camera.aspect = innerWidth/innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+    });
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.minDistance = 8;
+    controls.maxDistance = 45;
+    controls.target.set(0, 0, 0);
+    const gu = { time: { value: 0 } };
+    const sizes = [], shift = [];
+    const ps = () => shift.push(
+        Math.random()*Math.PI,
+        Math.random()*Math.PI*2,
+        (Math.random()*0.9+0.1)*Math.PI*0.1,
+        Math.random()*0.9+0.1
+    );
+    const pts = new Array(50000).fill().map(() => {
+        sizes.push(Math.random()*1.5+0.5); ps();
+        return new THREE.Vector3().randomDirection().multiplyScalar(Math.random()*0.5+9.5);
+    });
+    for (let i = 0; i < 100000; i++) {
+        const r=10, R=40, rand=Math.pow(Math.random(),1.5);
+        pts.push(new THREE.Vector3().setFromCylindricalCoords(
+            Math.sqrt(R*R*rand+(1-rand)*r*r),
+            Math.random()*2*Math.PI, (Math.random()-0.5)*2
+        ));
+        sizes.push(Math.random()*1.5+0.5); ps();
+    }
+    const g = new THREE.BufferGeometry().setFromPoints(pts);
+    g.setAttribute("sizes", new THREE.Float32BufferAttribute(sizes, 1));
+    g.setAttribute("shift", new THREE.Float32BufferAttribute(shift, 4));
+    const m = new THREE.PointsMaterial({
+        size:0.125, transparent:true, depthTest:false,
+        blending:THREE.AdditiveBlending,
+        onBeforeCompile: s => {
+            s.uniforms.time = gu.time;
+            s.vertexShader = `uniform float time;\nattribute float sizes;\nattribute vec4 shift;\nvarying vec3 vColor;\n${s.vertexShader}`
+                .replace(`gl_PointSize = size;`,`gl_PointSize = size * sizes;`)
+                .replace(`#include <color_vertex>`,`#include <color_vertex>
+                    float d=clamp(length(abs(position)/vec3(40.,10.,40.)),0.,1.);
+                    vColor=mix(vec3(227.,155.,0.),vec3(100.,50.,255.),d)/255.;`)
+                .replace(`#include <begin_vertex>`,`#include <begin_vertex>
+                    float moveT=mod(shift.x+shift.z*time,PI2);
+                    float moveS=mod(shift.y+shift.z*time,PI2);
+                    transformed+=vec3(cos(moveS)*sin(moveT),cos(moveT),sin(moveS)*sin(moveT))*shift.w;`);
+            s.fragmentShader = `varying vec3 vColor;\n${s.fragmentShader}`
+                .replace(`#include <clipping_planes_fragment>`,`#include <clipping_planes_fragment>\nfloat d=length(gl_PointCoord.xy-0.5);`)
+                .replace(`vec4 diffuseColor = vec4( diffuse, opacity );`,`vec4 diffuseColor=vec4(vColor,smoothstep(0.5,0.1,d));`);
+        }
+    });
+    const p = new THREE.Points(g, m);
+    p.rotation.order = "ZYX";
+    p.rotation.z = 0.2;
+    scene.add(p);
+    let zoomStart = null;
+    const ZOOM_DURATION = 2800;
+    window._startCameraZoom = () => { zoomStart = performance.now(); };
+    function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10*t); }
+    const clock = new THREE.Clock();
+    renderer.setAnimationLoop(() => {
+        controls.update();
+        if (zoomStart !== null) {
+            const elapsed = performance.now() - zoomStart;
+            const t = Math.min(elapsed / ZOOM_DURATION, 1);
+            const ease = easeOutExpo(t);
+            camera.position.z = CAM_START_Z + (CAM_END_Z - CAM_START_Z) * ease;
+            camera.position.y = 4;
+            if (t >= 1) zoomStart = null;
+        }
+        const t = clock.getElapsedTime()*0.5;
+        gu.time.value = t*Math.PI;
+        p.rotation.y = t*0.05;
+        renderer.render(scene, camera);
+    });
+</script>
+<script>
+    const intro   = document.getElementById('intro');
+    const box     = document.getElementById('box');
+    const mainSec = document.getElementById('main');
+    const dirsSec = document.getElementById('dirs');
+    const btnDir  = document.getElementById('btnDir');
+    const btnBack = document.getElementById('btnBack');
+    const fog     = document.getElementById('fog');
+    const fadeTargets = ['/portfolio/projects/Ant','/shredsauce','/assets/museum','/assets/museum/beta'];
+    setTimeout(() => {
+        if (window._startCameraZoom) window._startCameraZoom();
+        intro.classList.add('out');
+        setTimeout(() => {
+            box.classList.add('show');
+            mainSec.style.maxHeight = mainSec.scrollHeight + 'px';
+            mainSec.style.opacity   = '1';
+        }, 50);
+    }, 2700);
+    setTimeout(() => intro.classList.add('gone'), 3600);
+    dirsSec.querySelectorAll('details').forEach(d =>
+        d.addEventListener('toggle', () => {
+            if (dirsSec.style.opacity === '1')
+                dirsSec.style.maxHeight = dirsSec.scrollHeight + 'px';
+        })
+    );
+    dirsSec.addEventListener('click', e => {
+        if (dirsSec.style.opacity !== '1') return;
+        const a = e.target.closest?.('a');
+        if (!a || a.target?.toLowerCase() === '_blank') return;
+        const href = a.getAttribute('href');
+        if (!href) return;
+        try {
+            const url = new URL(href, location.href);
+            if (url.origin !== location.origin) return;
+            const path = url.pathname.replace(/\/+$/,'');
+            if (!fadeTargets.some(t => t.replace(/\/+$/,'') === path)) return;
+            e.preventDefault();
+            fog.classList.add('on');
+            setTimeout(() => location.assign(href), 450);
+        } catch {}
+    });
+    btnDir.addEventListener('click', () => {
+        mainSec.style.opacity   = '0';
+        mainSec.style.maxHeight = '0';
+        setTimeout(() => {
+            dirsSec.style.maxHeight = dirsSec.scrollHeight + 'px';
+            dirsSec.style.opacity   = '1';
+        }, 120);
+    });
+    btnBack.addEventListener('click', () => {
+        dirsSec.style.opacity   = '0';
+        dirsSec.style.maxHeight = '0';
+        setTimeout(() => {
+            mainSec.style.maxHeight = mainSec.scrollHeight + 'px';
+            mainSec.style.opacity   = '1';
+        }, 120);
+    });
+    window.addEventListener('resize', () => {
+        if (mainSec.style.opacity === '1') mainSec.style.maxHeight = mainSec.scrollHeight + 'px';
+        if (dirsSec.style.opacity === '1') dirsSec.style.maxHeight = dirsSec.scrollHeight + 'px';
+    });
+    const extModal  = document.getElementById('ext-modal');
+    const extCancel = document.getElementById('ext-cancel');
+    const extOpen   = document.getElementById('ext-open');
+    function closeExtModal() { extModal.classList.remove('show'); }
+    extCancel.addEventListener('click', closeExtModal);
+    extModal.addEventListener('click', e => { if (e.target === extModal) closeExtModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSsModal(); closeExtModal(); } });
+    function showGhError(href, msg) {
+        document.getElementById('gh-loading').style.display = 'none';
+        document.getElementById('gh-body').style.display    = 'none';
+        const err = document.getElementById('gh-error');
+        err.querySelector('p').textContent = msg;
+        document.getElementById('gh-error-link').href = href;
+        err.classList.add('show');
+    }
+    function renderMarkdown(md) {
+        md = md.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        md = md.replace(/^#{3} (.+)$/gm,"<h3>$1</h3>");
+        md = md.replace(/^#{2} (.+)$/gm,"<h2>$1</h2>");
+        md = md.replace(/^# (.+)$/gm,"<h1>$1</h1>");
+        md = md.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+        md = md.replace(/\*([^*\n]+)\*/g,"<em>$1</em>");
+        md = md.replace(/`([^`\n]+)`/g,"<code>$1</code>");
+        md = md.replace(/^---$/gm,"<hr>");
+        md = md.replace(/^\* (.+)$/gm,"<li>$1</li>");
+        md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+        md = md.replace(/\n\n/g,"<br><br>");
+        return md;
+    }
+    async function openGhRepo(href, label) {
+        document.getElementById('gh-loading').style.display = 'flex';
+        document.getElementById('gh-body').style.display    = 'none';
+        document.getElementById('gh-error').classList.remove('show');
+        document.getElementById('gh-content').scrollTop = 0;
+        document.getElementById('ext-bar-repo').textContent = label;
+        extOpen.href = href;
+        extModal.classList.add('show');
+        const match = href.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+        if (!match) { showGhError(href, 'Could not parse GitHub URL.'); return; }
+        const [, owner, repo] = match;
+        try {
+            const [repoRes, treeRes, readmeRes, releasesRes] = await Promise.all([
+                fetch(`https://api.github.com/repos/${owner}/${repo}`),
+                fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`),
+                fetch(`https://api.github.com/repos/${owner}/${repo}/readme`),
+                fetch(`https://api.github.com/repos/${owner}/${repo}/releases?per_page=5`)
+            ]);
+            if (!repoRes.ok) { showGhError(href, `Repo not found or API rate limited.`); return; }
+            const repoData   = await repoRes.json();
+            const treeData   = treeRes.ok   ? await treeRes.json()   : [];
+            const readmeData   = readmeRes.ok   ? await readmeRes.json()   : null;
+            const releasesData = releasesRes.ok ? await releasesRes.json() : [];
+            document.getElementById('gh-name-text').textContent = repoData.full_name;
+            document.getElementById('gh-desc').textContent      = repoData.description || 'No description.';
+            document.getElementById('gh-stars').textContent     = repoData.stargazers_count.toLocaleString();
+            document.getElementById('gh-forks').textContent     = repoData.forks_count.toLocaleString();
+            document.getElementById('gh-lang').textContent      = repoData.language || 'N/A';
+            document.getElementById('gh-license').textContent   = repoData.license?.spdx_id || 'None';
+            const topicsEl = document.getElementById('gh-topics');
+            topicsEl.innerHTML = (repoData.topics || []).map(t =>
+                `<div class="tag">${t}</div>`).join('');
+            const sorted = [...treeData].sort((a,b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type === 'dir' ? -1 : 1;
+            });
+            document.getElementById('gh-tree').innerHTML = sorted.map(f => `
+                <div class="gh-tree-row">
+                    <span class="type-icon">${f.type === 'dir' ? '📁' : '📄'}</span>
+                    <span class="name">${f.name}</span>
+                </div>`).join('');
+            const releasesEl    = document.getElementById("gh-releases");
+            const releasesTitle = document.getElementById("gh-releases-title");
+            if (releasesData.length > 0) {
+                releasesTitle.style.display = "flex";
+                releasesEl.innerHTML = releasesData.map(r => {
+                    const date = new Date(r.published_at).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
+                    const assets = (r.assets || []).map(a =>
+                        `<a class="gh-asset-btn" href="${a.browser_download_url}" target="_blank" rel="noopener">&#11123; ${a.name}</a>`
+                    ).join("");
+                    const body = r.body ? r.body.slice(0, 280) + (r.body.length > 280 ? "..." : "") : "";
+                    return `<div class="gh-release">
+                        <div class="gh-release-top">
+                            <span class="gh-release-tag">${r.tag_name}</span>
+                            <span class="gh-release-name">${r.name || r.tag_name}</span>
+                            ${r.prerelease ? '<span class="gh-release-badge">pre-release</span>' : ""}
+                            ${r.draft ? '<span class="gh-release-badge">draft</span>' : ""}
+                            <span class="gh-release-date">${date}</span>
+                        </div>
+                        ${body ? `<div class="gh-release-body">${body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>` : ""}
+                        ${assets ? `<div class="gh-release-assets">${assets}</div>` : ""}
+                    </div>`;
+                }).join("");
+            } else {
+                releasesTitle.style.display = "none";
+                releasesEl.innerHTML = "";
+            }
+            const readmeEl = document.getElementById("gh-readme");
+            if (readmeData?.content) {
+                const raw = atob(readmeData.content.split('\n').join(''));
+                readmeEl.innerHTML = renderMarkdown(raw);
+                document.getElementById('gh-readme-title').style.display = 'flex';
+                readmeEl.style.display = 'block';
+            } else {
+                document.getElementById('gh-readme-title').style.display = 'none';
+                readmeEl.style.display = 'none';
+            }
+            document.getElementById('gh-loading').style.display = 'none';
+            document.getElementById('gh-body').style.display    = 'block';
+        } catch(e) {
+            showGhError(href, 'Failed to load repo. You may be rate limited.');
+        }
+    }
+    const ssModal   = document.getElementById('ss-modal');
+    const ssCancel  = document.getElementById('ss-cancel');
+    const ssOpen    = document.getElementById('ss-open');
+    const ssBarPage = document.getElementById('ss-bar-page');
+    const ssPageUrls = {
+        scripts:   '/shredsauce/scripts',
+        cheats:    '/shredsauce/cheats',
+        tutorials: '/shredsauce/tutorials',
+    };
+    function closeSsModal() {
+        ssModal.classList.remove('show');
+        document.querySelectorAll('.ss-page').forEach(p => p.style.display = 'none');
+    }
+    ssCancel.addEventListener('click', closeSsModal);
+    ssModal.addEventListener('click', e => { if (e.target === ssModal) closeSsModal(); });
+    function openSsPage(key) {
+        document.querySelectorAll('.ss-page').forEach(p => p.style.display = 'none');
+        const page = document.getElementById('ss-page-' + key);
+        if (!page) return;
+        page.style.display = 'block';
+        ssBarPage.textContent = '/shredsauce/' + key;
+        ssOpen.href = ssPageUrls[key] || '#';
+        document.getElementById('ss-content').scrollTop = 0;
+        ssModal.classList.add('show');
+    }
+    document.getElementById('dirs').addEventListener('click', e => {
+        const a = e.target.closest('a');
+        if (!a) return;
+        const ssKey = a.getAttribute('data-ss');
+        if (ssKey) { e.preventDefault(); openSsPage(ssKey); return; }
+        const href = a.getAttribute('href');
+        if (!href) return;
+        try {
+            const url = new URL(href, location.href);
+            if (url.origin !== location.origin) {
+                e.preventDefault();
+                if (url.hostname === 'github.com') {
+                    openGhRepo(href, a.textContent.trim());
+                } else {
+                    window.open(href, '_blank', 'noopener,noreferrer');
+                }
+            }
+        } catch {}
+    });
+</script>
+</body>
+</html>

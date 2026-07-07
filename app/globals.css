@@ -1,0 +1,420 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/*  RETRO OS — Windows 95 plastic. No blur, no glass. Hard bevels only. */
+/* ------------------------------------------------------------------ */
+
+.os-root {
+  --face: #c0c0c0;
+  --face-dark: #808080;
+  --face-darker: #404040;
+  --face-light: #dfdfdf;
+  --face-lighter: #ffffff;
+  --desktop: #008080;
+  --title-a: #000080;
+  --title-b: #1084d0;
+  --title-inactive-a: #808080;
+  --title-inactive-b: #b5b5b5;
+  --title-text: #ffffff;
+  --sel: #000080;
+  --sel-text: #ffffff;
+  --link: #0000aa;
+
+  font-family: Tahoma, 'MS Sans Serif', 'Segoe UI', sans-serif;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #000;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  text-rendering: optimizeSpeed;
+  cursor: default;
+  user-select: none;
+}
+
+.os-root[data-theme='midnight'] {
+  --desktop: #000000;
+  --title-a: #1f1f1f;
+  --title-b: #4d4d4d;
+  --sel: #333333;
+}
+
+.os-root[data-theme='matrix'] {
+  --desktop: #010801;
+  --title-a: #003300;
+  --title-b: #00a800;
+  --sel: #005500;
+  --link: #007700;
+}
+
+/* Raised plastic (buttons, windows, taskbar) */
+.bevel-up {
+  background: var(--face);
+  box-shadow:
+    inset -1px -1px 0 #0a0a0a,
+    inset 1px 1px 0 var(--face-lighter),
+    inset -2px -2px 0 var(--face-dark),
+    inset 2px 2px 0 var(--face-light);
+}
+
+/* Pressed-in plastic */
+.bevel-down {
+  background: var(--face);
+  box-shadow:
+    inset -1px -1px 0 var(--face-lighter),
+    inset 1px 1px 0 #0a0a0a,
+    inset -2px -2px 0 var(--face-light),
+    inset 2px 2px 0 var(--face-dark);
+}
+
+/* Sunken white content well (explorer panes, text fields, readme) */
+.bevel-field {
+  background: #fff;
+  box-shadow:
+    inset -1px -1px 0 var(--face-lighter),
+    inset 1px 1px 0 var(--face-dark),
+    inset -2px -2px 0 var(--face-light),
+    inset 2px 2px 0 #0a0a0a;
+}
+
+/* Thin groove (status bars, separators) */
+.bevel-groove {
+  box-shadow:
+    inset -1px -1px 0 var(--face-lighter),
+    inset 1px 1px 0 var(--face-dark);
+}
+
+.w95-btn {
+  background: var(--face);
+  box-shadow:
+    inset -1px -1px 0 #0a0a0a,
+    inset 1px 1px 0 var(--face-lighter),
+    inset -2px -2px 0 var(--face-dark),
+    inset 2px 2px 0 var(--face-light);
+  padding: 3px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  color: #000;
+  min-width: 0;
+}
+.w95-btn:active,
+.w95-btn.pressed {
+  box-shadow:
+    inset -1px -1px 0 var(--face-lighter),
+    inset 1px 1px 0 #0a0a0a,
+    inset -2px -2px 0 var(--face-light),
+    inset 2px 2px 0 var(--face-dark);
+}
+.w95-btn:active > *,
+.w95-btn.pressed > * {
+  transform: translate(1px, 1px);
+}
+.w95-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -5px;
+}
+
+/* Tiny titlebar control buttons (_ □ X) */
+.ctrl-btn {
+  width: 16px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 1;
+  background: var(--face);
+  box-shadow:
+    inset -1px -1px 0 #0a0a0a,
+    inset 1px 1px 0 var(--face-lighter),
+    inset -2px -2px 0 var(--face-dark),
+    inset 2px 2px 0 var(--face-light);
+  color: #000;
+}
+.ctrl-btn:active {
+  box-shadow:
+    inset -1px -1px 0 var(--face-lighter),
+    inset 1px 1px 0 #0a0a0a,
+    inset -2px -2px 0 var(--face-light),
+    inset 2px 2px 0 var(--face-dark);
+}
+.ctrl-btn:active > * {
+  transform: translate(1px, 1px);
+}
+
+.titlebar {
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  color: var(--title-text);
+}
+.titlebar-inactive {
+  background: linear-gradient(
+    90deg,
+    var(--title-inactive-a),
+    var(--title-inactive-b)
+  );
+  color: var(--face-light);
+}
+
+.menu-item {
+  padding: 2px 7px;
+}
+.menu-item:hover {
+  background: var(--sel);
+  color: var(--sel-text);
+}
+
+.os-link {
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+.tree-row:hover {
+  background: var(--sel);
+  color: var(--sel-text);
+}
+.tree-row:hover .os-link {
+  color: var(--sel-text);
+}
+
+.desktop-icon {
+  width: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 2px;
+  text-align: center;
+}
+.desktop-icon .icon-label {
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  font-size: 11px;
+  line-height: 1.2;
+  padding: 0 2px;
+}
+.desktop-icon.selected .icon-label {
+  background: var(--sel);
+  outline: 1px dotted #fff;
+}
+
+.os-scroll {
+  scrollbar-width: auto;
+  scrollbar-color: var(--face-dark) var(--face-light);
+}
+.os-scroll::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+.os-scroll::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(#fff 0% 25%, #c0c0c0 0% 50%) 0 0 / 2px
+    2px;
+}
+.os-scroll::-webkit-scrollbar-thumb {
+  background: var(--face);
+  box-shadow:
+    inset -1px -1px 0 #0a0a0a,
+    inset 1px 1px 0 #fff,
+    inset -2px -2px 0 var(--face-dark),
+    inset 2px 2px 0 var(--face-light);
+}
+
+/* README content inside the GitHub viewer */
+.gh-readme-body h1,
+.gh-readme-body h2,
+.gh-readme-body h3 {
+  font-weight: bold;
+  margin: 8px 0 4px;
+}
+.gh-readme-body h1 {
+  font-size: 14px;
+}
+.gh-readme-body h2 {
+  font-size: 13px;
+}
+.gh-readme-body h3 {
+  font-size: 12px;
+}
+.gh-readme-body code {
+  font-family: 'Courier New', monospace;
+  background: #e4e4e4;
+  padding: 0 3px;
+}
+.gh-readme-body pre {
+  background: #e4e4e4;
+  padding: 6px;
+  overflow-x: auto;
+  margin: 6px 0;
+  box-shadow:
+    inset -1px -1px 0 #fff,
+    inset 1px 1px 0 #808080;
+}
+.gh-readme-body pre code {
+  background: none;
+  padding: 0;
+}
+.gh-readme-body a {
+  color: var(--link);
+  text-decoration: underline;
+}
+.gh-readme-body hr {
+  border: none;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
+  margin: 8px 0;
+}
+.gh-readme-body ul,
+.gh-readme-body ol {
+  padding-left: 20px;
+  list-style: disc;
+}
+
+/* ------------------------------------------------------------------ */
+/*  The OS surface projected onto the CRT glass (drei Html transform)  */
+/* ------------------------------------------------------------------ */
+
+.crt-dom-screen {
+  position: relative;
+  width: 1024px;
+  height: 768px;
+  overflow: hidden;
+  background: #000;
+  /* soft tube corners */
+  border-radius: 26px / 20px;
+}
+
+/* scanlines + vignette over the DOM so it still reads as a tube */
+.crt-dom-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse 55% 40% at 36% 26%,
+      rgba(190, 215, 255, 0.07),
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.14) 0px,
+      rgba(0, 0, 0, 0.14) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  box-shadow:
+    inset 0 0 90px rgba(0, 0, 0, 0.5),
+    inset 0 0 18px rgba(0, 0, 0, 0.6);
+}
+
+/* CRT flash used during the canvas -> DOM handoff */
+@keyframes crt-static-flash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.crt-flash {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.06) 0px,
+      rgba(255, 255, 255, 0.06) 1px,
+      rgba(0, 0, 0, 0.4) 2px,
+      rgba(0, 0, 0, 0.4) 3px
+    ),
+    #050505;
+  animation: crt-static-flash 0.9s ease-out forwards;
+}
+
+/* blackout: sparks show, then the dark floods in and holds */
+@keyframes blackout-fade-kf {
+  0% {
+    background: rgba(0, 0, 0, 0.15);
+  }
+  55% {
+    background: rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    background: rgba(0, 0, 0, 1);
+  }
+}
+.blackout-fade {
+  background: rgba(0, 0, 0, 0.15);
+  animation: blackout-fade-kf 2.2s ease-in forwards;
+}
+
+/* warp drive: hold clear while the stars streak, then white-out */
+@keyframes warp-flash-kf {
+  0%,
+  62% {
+    opacity: 0;
+  }
+  88%,
+  100% {
+    opacity: 1;
+  }
+}
+.warp-flash {
+  background: #fff;
+  opacity: 0;
+  animation: warp-flash-kf 2.6s ease-in forwards;
+}
+
+/* konami code: DVD-style bouncing logo */
+.dvd-logo {
+  position: absolute;
+  z-index: 9400;
+  width: 150px;
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  font-size: 22px;
+  cursor: pointer;
+  user-select: none;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+.dvd-logo small {
+  font-size: 8px;
+  letter-spacing: 0.4em;
+  opacity: 0.8;
+}
+
+@keyframes boot-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.boot-cursor {
+  animation: boot-blink 1s steps(1) infinite;
+}

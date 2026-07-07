@@ -1,2 +1,5 @@
 spaceships/
 portfolio/
+node_modules/
+.next/
+anode/
