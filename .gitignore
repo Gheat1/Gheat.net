@@ -3,3 +3,4 @@ portfolio/
 node_modules/
 .next/
 anode/
+.next-verify/
